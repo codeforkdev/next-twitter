@@ -1,5 +1,6 @@
 "use client";
-import { submitPost } from "@/app/actions";
+import { user } from "@/mock-data";
+import { submitPost } from "@/actions";
 import { useState } from "react";
 import TextareaAutoSize from "react-textarea-autosize";
 
@@ -10,7 +11,7 @@ export default function PostForm() {
       action={(e) => {
         const cleanText = text.trim();
         if (!cleanText) return;
-        submitPost({ userId: "123123123123123123123", text: cleanText });
+        submitPost({ userId: user.id, text: cleanText });
       }}
     >
       <TextareaAutoSize

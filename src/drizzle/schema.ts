@@ -1,22 +1,23 @@
-import { relations } from "drizzle-orm";
-import { char, mysqlTable, varchar } from "drizzle-orm/mysql-core";
+import { relations, sql } from "drizzle-orm";
+import { sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const users = mysqlTable("users", {
-  id: char("id", { length: 21 }).notNull().primaryKey(),
-  handle: varchar("handle", { length: 32 }).notNull().unique(),
+export const users = sqliteTable("users", {
+  id: text("id", { length: 21 }).notNull().primaryKey(),
+  handle: text("handle", { length: 32 }).notNull().unique(),
 });
 
 export const userRelations = relations(users, ({ many }) => ({
   posts: many(posts),
   bookmarks: many(bookmarks),
+  conversationParticipants: many(conversationParticipants),
 }));
 
-export const posts = mysqlTable("posts", {
-  id: char("id", { length: 21 }).notNull().primaryKey(),
-  userId: char("user_id", { length: 21 })
+export const posts = sqliteTable("posts", {
+  id: text("id", { length: 21 }).notNull().primaryKey(),
+  userId: text("user_id", { length: 21 })
     .notNull()
     .references(() => users.id),
-  text: varchar("text", { length: 500 }).notNull(),
+  text: text("text", { length: 500 }).notNull(),
 });
 
 export const postRelations = relations(posts, ({ one, many }) => ({
@@ -28,12 +29,12 @@ export const postRelations = relations(posts, ({ one, many }) => ({
   likes: many(likes),
 }));
 
-export const bookmarks = mysqlTable("bookmarks", {
-  id: char("id", { length: 21 }).notNull().primaryKey(),
-  userId: char("user_id", { length: 21 })
+export const bookmarks = sqliteTable("bookmarks", {
+  id: text("id", { length: 21 }).notNull().primaryKey(),
+  userId: text("user_id", { length: 21 })
     .notNull()
     .references(() => users.id),
-  postId: char("post_id", { length: 21 })
+  postId: text("post_id", { length: 21 })
     .notNull()
     .references(() => posts.id),
 });
@@ -45,12 +46,12 @@ export const bookmarkRelations = relations(bookmarks, ({ one }) => ({
   }),
 }));
 
-export const likes = mysqlTable("likes", {
-  id: char("id", { length: 21 }).notNull().primaryKey(),
-  userId: char("user_id", { length: 21 })
+export const likes = sqliteTable("likes", {
+  id: text("id", { length: 21 }).notNull().primaryKey(),
+  userId: text("user_id", { length: 21 })
     .notNull()
     .references(() => users.id),
-  postId: char("post_id", { length: 21 })
+  postId: text("post_id", { length: 21 })
     .notNull()
     .references(() => posts.id),
 });
@@ -62,15 +63,57 @@ export const likeRelations = relations(likes, ({ one }) => ({
   }),
 }));
 
-export const conversations = mysqlTable("conversation", {
-  id: char("id", { length: 21 }).notNull().primaryKey(),
+export const conversations = sqliteTable("conversation", {
+  id: text("id", { length: 21 }).notNull().primaryKey(),
 });
 
-export const conversationParticipants = mysqlTable(
+export const conversationsRelations = relations(conversations, ({ many }) => ({
+  participants: many(conversationParticipants),
+  messages: many(conversationMessages),
+}));
+
+export const conversationParticipants = sqliteTable(
   "conversation_participants",
   {
-    id: char("id", { length: 21 }).notNull().primaryKey(),
-    conversationId: char("conversation_id", { length: 21 }).notNull(),
-    userId: char("user_id", { length: 21 }).notNull(),
+    id: text("id", { length: 21 }).notNull().primaryKey(),
+    conversationId: text("conversation_id", { length: 21 }).notNull(),
+    userId: text("user_id", { length: 21 }).notNull(),
   }
+);
+
+export const conversationParticipantsRelations = relations(
+  conversationParticipants,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [conversationParticipants.userId],
+      references: [users.id],
+    }),
+    conversation: one(conversations, {
+      fields: [conversationParticipants.conversationId],
+      references: [conversations.id],
+    }),
+  })
+);
+
+export const conversationMessages = sqliteTable("conversation_messages", {
+  id: text("id", { length: 21 }).notNull().primaryKey(),
+  conversationId: text("conversation_id", { length: 21 }).notNull(),
+  participantId: text("conversation_participant_id", {
+    length: 21,
+  }).notNull(),
+  text: text("text").notNull(),
+});
+
+export const conversationMessagesRelations = relations(
+  conversationMessages,
+  ({ one }) => ({
+    conversation: one(conversations, {
+      fields: [conversationMessages.conversationId],
+      references: [conversations.id],
+    }),
+    sender: one(conversationParticipants, {
+      fields: [conversationMessages.participantId],
+      references: [conversationParticipants.id],
+    }),
+  })
 );

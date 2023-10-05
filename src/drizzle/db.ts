@@ -1,12 +1,10 @@
 import * as schema from "./schema";
-import { drizzle } from "drizzle-orm/mysql2";
-import mysql from "mysql2/promise";
+import { drizzle } from "drizzle-orm/libsql";
+import { createClient } from "@libsql/client";
 
-const poolConnection = mysql.createPool({
-  host: "containers-us-west-79.railway.app",
-  user: "root",
-  database: "railway",
-  uri: process.env.DB_URL,
+const client = createClient({
+  url: "libsql://next-twitter-codeforkdev.turso.io",
+  authToken: process.env.DB_TOKEN,
 });
 
-export const db = drizzle(poolConnection, { schema, mode: "default" });
+export const db = drizzle(client, { schema });

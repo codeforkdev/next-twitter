@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { user } from "@/mock-data";
-import { toggleBookmark, toggleLike } from "@/app/actions";
+import { toggleBookmark, toggleLike } from "@/actions";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 

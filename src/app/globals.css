@@ -4,5 +4,5 @@
 
 html,
 body {
-  @apply h-full bg-slate-950 text-white;
+  @apply h-full bg-black text-white;
 }
