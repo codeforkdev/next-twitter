@@ -1,5 +1,8 @@
 import { db } from "@/drizzle/db";
-import { conversationParticipants, conversations } from "@/drizzle/schema";
+import {
+  conversationParticipants,
+  conversations,
+} from "../../../drizzle/schema";
 import { user } from "@/mock-data";
 import { and, eq } from "drizzle-orm";
 import ChatInput from "./ChatInput";

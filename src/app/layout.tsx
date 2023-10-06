@@ -3,9 +3,11 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 
-import { DesktopNavigation, MobileNavigation } from "./Navigation";
 import Link from "next/link";
-import { Github, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
+import React from "react";
+import { DesktopNavbar } from "@/components/Navigation/DesktopNavigation";
+import { MobileNavbar } from "@/components/Navigation/MobileNavigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,29 +18,57 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className={cn(inter.className)}>
-        <div className="flex flex-col tablet:flex-row tablet:max-w-4xl desktop:max-w-7xl h-full mx-auto ">
-          <DesktopNavigation />
-          <main className="flex-1  relative">
-            {children}
-            <LinkTree />
-          </main>
-
-          <MobileNavigation />
-        </div>
+      <body className={inter.className}>
+        <Container>
+          <DesktopNavbar />
+          <Main>{children}</Main>
+          <MobileNavbar />
+        </Container>
+        <Modal>{modal}</Modal>
       </body>
     </html>
   );
 }
 
+function Modal({ children }: { children: React.ReactNode }) {
+  return <div className="z-[9999]">{children}</div>;
+}
+
+function Container({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col mx-auto max-w-[700px]",
+        "tablet:flex-row",
+        "laptop:max-w-[1000px]",
+        "desktop:max-w-[1236px]",
+        inter.className
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+function Main({ children }: { children: React.ReactNode }) {
+  return (
+    <main className="flex-1  relative">
+      {children}
+      <LinkTree />
+    </main>
+  );
+}
+
 function LinkTree() {
   return (
-    <div className="fixed right-0 top-10 text-white">
+    <div className="fixed right-0 top-20 text-white z-[999]">
       <Link href="https://github.com/codeforkdev/next-twitter" target="_blank">
         <div className="rounded-l-full h-8 w-10 pl-3 flex items-center bg-indigo-500">
           <Sparkles size={18} />

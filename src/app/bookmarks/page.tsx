@@ -1,6 +1,6 @@
 import Post from "@/components/Post";
 import { db } from "@/drizzle/db";
-import { bookmarks, users } from "@/drizzle/schema";
+import { bookmarks, users } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 
 export default async function Page() {

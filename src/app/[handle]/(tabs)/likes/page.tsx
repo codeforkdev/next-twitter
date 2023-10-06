@@ -1,3 +1,3 @@
 export default function Page() {
-  return <div>Dev Page</div>;
+  return <p>Likes</p>;
 }

@@ -1,10 +1,10 @@
 import NewConversationModal from "@/components/NewConversationModal";
 import { db } from "@/drizzle/db";
-import { conversationParticipants } from "@/drizzle/schema";
+import { conversationParticipants } from "../../drizzle/schema";
 import { user } from "@/mock-data";
 import { eq } from "drizzle-orm";
 import React from "react";
-import Conversations from "./Conversations";
+import Conversations from "./@components/Conversations";
 
 export default async function Layout({
   children,

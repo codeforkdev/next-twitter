@@ -1,14 +1,35 @@
-export default function Page() {
+import Post from "@/components/Post";
+import { db } from "@/drizzle/db";
+import { eq } from "drizzle-orm";
+import { user } from "@/mock/mock-data";
+import { bookmarks } from "@/drizzle/schema";
+export default async function Home() {
+  const posts = await db.query.posts.findMany({
+    columns: {
+      id: true,
+      text: true,
+    },
+    with: {
+      author: true,
+      bookmarks: {
+        where: eq(bookmarks.userId, user.id),
+      },
+      likes: {
+        columns: {
+          userId: true,
+        },
+      },
+    },
+  });
+
+  console.log(posts);
   return (
-    <div>
-      <div className="h-[49px] flex flex-col justify-center border-b border-white/20">
-        <p className="text-primary text-center text-[15px] tracking-tight">
-          Show 105 posts
-        </p>
-      </div>
-      {new Array(200).fill(null).map((v, i) => (
-        <div>{i}</div>
+    <ol className="flex flex-col">
+      {posts?.map((post) => (
+        <li className="border-b border-white/20 py-3 px-4 ">
+          <Post {...post} isBookmarked={post.bookmarks.length !== 0} />
+        </li>
       ))}
-    </div>
+    </ol>
   );
 }

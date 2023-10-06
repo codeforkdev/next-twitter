@@ -1,35 +1,28 @@
 "use client";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { user } from "@/mock-data";
-import Link from "next/link";
+import { user } from "@/mock/mock-data";
 import {
-  Home,
-  Search,
   Bell,
-  Mail,
-  GanttChartSquare,
   Bookmark,
-  Users2,
   Feather,
+  GanttChartSquare,
+  Home,
   LucideIcon,
+  Mail,
   MoreHorizontal,
+  Search,
   User,
+  Users2,
 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  motion,
-  useMotionValueEvent,
-  useScroll,
-  useVelocity,
-} from "framer-motion";
-import { useState } from "react";
 
-export function DesktopNavigation() {
+export function DesktopNavbar() {
   let cls = "py-1 group w-full flex justify-center desktop:justify-start";
   return (
-    <nav className="hidden min-w-[69px] tablet:flex desktop:w-[275px] h-full flex-col border-r border-r-white/20 sticky top-0 border">
-      <ul className="flex flex-col items-center desktop:items-start pl-1">
+    <nav className="hidden h-screen  min-w-[69px] tablet:flex desktop:w-[275px] flex-col  sticky top-0 border-white/20 border-r ">
+      <ul className="flex flex-col items-center desktop:items-start pl-1 sticky top-0 left-0">
         <Link
           href="/"
           className="w-fit rounded-full p-4 hover:bg-white/10 ml-2 desktop:ml-0"
@@ -107,7 +100,7 @@ export function DesktopNavigation() {
             </div>
           </LinkContent>
         </Link>
-        <div className="mt-5" />
+        <div className="mt-2" />
         <button className="py-[13.5px] hover:bg-white/10 rounded-full text-[17px] h-[52px] w-[52px] flex items-center justify-center desktop:w-full bg-primary max-w-[232px] font-semibold">
           <span className="hidden desktop:block">Post</span>
           <span className="desktop:hidden ">
@@ -116,76 +109,6 @@ export function DesktopNavigation() {
         </button>
       </ul>
     </nav>
-  );
-}
-
-export function MobileNavigation() {
-  const { scrollY } = useScroll();
-  const [y, setY] = useState(scrollY.get());
-  const [show, setShow] = useState(y === 0 ? true : false);
-  const scrollVelocity = useVelocity(scrollY);
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    if (latest === 0) {
-      setShow(true);
-      return;
-    }
-    if (latest < y) {
-      console.log("scrolling up", scrollVelocity.get());
-      if (scrollVelocity.get() < -3200) {
-        setShow(true);
-      }
-    } else {
-      setShow(false);
-      console.log("scrolling down", scrollVelocity.get());
-    }
-    setY(latest);
-  });
-  console.log("dim", !show);
-
-  return (
-    <>
-      <motion.button
-        animate={show ? "bright" : "dim"}
-        variants={{
-          dim: {
-            opacity: 0.4,
-          },
-          bright: {
-            opacity: 1,
-          },
-        }}
-        className="h-14 w-14 bg-primary flex justify-center items-center  rounded-full fixed bottom-[74px] right-5"
-      >
-        <Feather size={26} />
-      </motion.button>
-      <motion.nav
-        animate={show ? "bright" : "dim"}
-        variants={{
-          dim: {
-            opacity: 0.4,
-          },
-          bright: {
-            opacity: 1,
-          },
-        }}
-        className="h-[53px] border-t border-t-slate-700 tablet:hidden fixed bottom-0 left-0 w-full bg-black"
-      >
-        <ul className="flex justify-evenly gap-8 items-center h-full max-w-[352px] mx-auto">
-          <Link href="/home">
-            <Icon Icon={Home} href="/home" />
-          </Link>
-          <Link href="/explore">
-            <Icon Icon={Search} href="/explore" />
-          </Link>
-          <Link href="/notifications">
-            <Icon Icon={Bell} href="/notifications" />
-          </Link>
-          <Link href={"/messages"}>
-            <Icon Icon={Mail} href="/messages" />
-          </Link>
-        </ul>
-      </motion.nav>
-    </>
   );
 }
 
@@ -209,7 +132,7 @@ const LinkContent = ({ children }: { children: React.ReactNode }) => {
   return (
     <div
       className={cn(
-        "flex gap-2 w-fit bg-none desktop:group-hover:bg-white/10 transition-colors rounded-full desktop:pr-8 pl-1 items-center h-[50px]"
+        "flex gap-[10px] w-fit bg-none desktop:group-hover:bg-white/10 transition-colors rounded-full desktop:pr-8 pl-1 items-center h-[42px]"
       )}
     >
       {children}
@@ -227,7 +150,7 @@ const Label = ({
   const pathname = usePathname();
   return (
     <span
-      className={cn("hidden desktop:block text-slate-100 text-[19px]", {
+      className={cn("hidden desktop:block text-slate-100 text-[20px]", {
         "font-semibold text-white": href === pathname,
       })}
     >

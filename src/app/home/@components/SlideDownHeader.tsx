@@ -3,25 +3,25 @@ import { useMotionValueEvent, useScroll, useVelocity } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 export default function Header() {
+  const pathname = usePathname();
   const { scrollY } = useScroll();
   const [y, setY] = useState(scrollY.get());
   const [show, setShow] = useState(y === 0 ? true : false);
   const scrollVelocity = useVelocity(scrollY);
   useMotionValueEvent(scrollY, "change", (latest) => {
     if (latest < y) {
-      console.log("scrolling up", scrollVelocity.get());
       if (scrollVelocity.get() < -3200) {
         setShow(true);
       }
     } else {
       setShow(false);
-      console.log("scrolling down", scrollVelocity.get());
     }
     setY(latest);
   });
-  console.log(show);
   return (
     <motion.header
       initial={{ top: 0 }}
@@ -39,20 +39,15 @@ export default function Header() {
           },
         },
       }}
-      className="sticky  w-full h-[106px] shrink-0 flex flex-col justify-between"
+      className="sticky w-full h-[106px] shrink-0 flex flex-col justify-between z-10"
+      style={{ backdropFilter: "blur(10px)" }}
     >
       {/* avatar title section */}
-      <section className="flex ">
-        {/* buffer */}
-        <div
-          className="absolute h-full w-full bg-black/10 -z-10 "
-          style={{ backdropFilter: "blur(10px)" }}
-        />
-
+      <section className="flex">
         {/* Desktop title */}
         <h1 className="hidden font-semibold text-xl text-gray-100">Home</h1>
 
-        {/* Profile */}
+        {/* Profile Avatar */}
         <div className="flex-1 pl-4 pt-[10px]">
           <div className="h-8 w-8 rounded-full overflow-clip relative ">
             <Image
@@ -70,21 +65,32 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Buffer to senter logo */}
+        {/* Buffer to center logo */}
         <div className="flex-1" />
       </section>
 
-      {/* Controls */}
+      {/* Tabs */}
       <section className="flex  border-b border-white/20">
         <Link
           href="/home"
           className="flex-1 h-full flex items-center justify-center "
         >
           <div className="h-full flex flex-col justify-end ">
-            <p className="text-center font-bold text-[14px] tracking-wide flex mb-3">
+            <p
+              className={cn(
+                "text-center  text-[15px] tracking-wide flex mb-3 text-gray-500 font-semibold",
+                {
+                  "text-white": pathname === "/home",
+                }
+              )}
+            >
               For you
             </p>
-            <div className="bg-primary h-1 rounded-full" />
+            <div
+              className={cn("bg-transparent h-1 rounded-full", {
+                "bg-primary": pathname === "/home",
+              })}
+            />
           </div>
         </Link>
         <Link
@@ -92,10 +98,21 @@ export default function Header() {
           className="flex-1 h-full flex items-center justify-center "
         >
           <div className="h-full flex flex-col justify-end ">
-            <p className="text-center  text-[15px] tracking-wide flex mb-3 text-gray-500 font-semibold">
+            <p
+              className={cn(
+                "text-center  text-[15px] tracking-wide flex mb-3 text-gray-500 font-semibold",
+                {
+                  "text-white": pathname === "/home/following",
+                }
+              )}
+            >
               Following
             </p>
-            <div className="bg-none h-1 rounded-full" />
+            <div
+              className={cn("bg-transparent h-1 rounded-full", {
+                "bg-primary": pathname === "/home/following",
+              })}
+            />
           </div>
         </Link>
       </section>

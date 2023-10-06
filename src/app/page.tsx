@@ -1,44 +1,48 @@
 import Post from "@/components/Post";
-import PostForm from "@/components/PostForm";
-import { db } from "@/drizzle/db";
-import { bookmarks, users } from "@/drizzle/schema";
-import { user } from "@/mock-data";
+import { bookmarks } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { db } from "@/drizzle/db";
+import { user } from "@/mock/mock-data";
 export default async function Home() {
-  const posts = await db.query.posts.findMany({
-    columns: {
-      id: true,
-      text: true,
-    },
-    with: {
-      user: {
-        columns: {
-          id: true,
-          handle: true,
+  try {
+    const posts = await db.query.posts.findMany({
+      columns: {
+        id: true,
+        text: true,
+      },
+      with: {
+        author: true,
+        bookmarks: {
+          where: eq(bookmarks.userId, user.id),
+        },
+        likes: {
+          columns: {
+            userId: true,
+          },
         },
       },
-      bookmarks: {
-        where: eq(bookmarks.userId, user.id),
-      },
-      likes: {
-        columns: {
-          userId: true,
-        },
-      },
-    },
-  });
+    });
 
-  console.log(posts);
-  return (
-    <div>
-      <PostForm />
-      <ul>
-        {posts?.map((post) => (
-          <li>
-            <Post {...post} isBookmarked={post.bookmarks.length !== 0} />
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+    return (
+      <div>
+        {/* <PostForm /> */}
+        <ul>
+          {posts?.map((post) => (
+            <li key={post.id}>
+              <Post
+                id={post.id}
+                author={post.author}
+                likes={post.likes}
+                text={post.text}
+                isBookmarked={post.bookmarks.length !== 0}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  } catch (e) {
+    console.log(e);
+  }
+  return <div>whoops</div>;
 }

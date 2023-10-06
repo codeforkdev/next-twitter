@@ -1,3 +1,4 @@
+"use client";
 export default function Page() {
-  return <div>Explore page</div>;
+  return <p>For you</p>;
 }

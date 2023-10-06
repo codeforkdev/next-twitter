@@ -7,11 +7,12 @@ import {
   conversationMessages,
   conversationParticipants,
   conversations,
+  followings,
   likes,
   posts,
   users,
-} from "@/drizzle/schema";
-import { and, eq, inArray, like, sql } from "drizzle-orm";
+} from "../drizzle/schema";
+import { and, eq, inArray, like, or, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
 export const submitPost = async ({
@@ -70,7 +71,10 @@ export const toggleLike = async ({
 
 export const searchUsers = async (term: string) => {
   const usersList = await db.query.users.findMany({
-    where: like(users.handle, `%${term}%`),
+    where: or(
+      like(users.handle, `%${term}%`),
+      like(users.displayName, `%${term}%`)
+    ),
   });
 
   return usersList;
@@ -144,4 +148,30 @@ export const createMessage = async (message: CreateMessageProps) => {
     body: JSON.stringify(newMessage),
   });
   console.log("create new message", message);
+};
+
+export const followAction = async (
+  isFollowing: boolean,
+  followerId: string,
+  followingId: string
+) => {
+  console.log("Follow user");
+  if (isFollowing) {
+    console.log("unfollowing");
+    await db
+      .delete(followings)
+      .where(
+        and(
+          eq(followings.followerId, followerId),
+          eq(followings.followingId, followingId)
+        )
+      );
+  } else {
+    console.log("following");
+    await db
+      .insert(followings)
+      .values({ id: nanoid(), followerId, followingId });
+  }
+  revalidatePath("/");
+  return {};
 };
