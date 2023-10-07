@@ -1,48 +1,12 @@
 "use client";
-import { useMotionValueEvent, useScroll, useVelocity } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 export default function Header() {
   const pathname = usePathname();
-  const { scrollY } = useScroll();
-  const [y, setY] = useState(scrollY.get());
-  const [show, setShow] = useState(y === 0 ? true : false);
-  const scrollVelocity = useVelocity(scrollY);
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    if (latest < y) {
-      if (scrollVelocity.get() < -3200) {
-        setShow(true);
-      }
-    } else {
-      setShow(false);
-    }
-    setY(latest);
-  });
   return (
-    <motion.header
-      initial={{ top: 0 }}
-      animate={show ? "show" : "hide"}
-      variants={{
-        show: {
-          top: 0,
-        },
-        hide: {
-          top: -106,
-          transition: {
-            duration: 0.3,
-            type: "tween",
-            ease: "easeOut",
-          },
-        },
-      }}
-      className="sticky w-full h-[106px] shrink-0 flex flex-col justify-between z-10"
-      style={{ backdropFilter: "blur(10px)" }}
-    >
-      {/* avatar title section */}
+    <div>
       <section className="flex">
         {/* Desktop title */}
         <h1 className="hidden font-semibold text-xl text-gray-100">Home</h1>
@@ -116,6 +80,6 @@ export default function Header() {
           </div>
         </Link>
       </section>
-    </motion.header>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
-import { user } from "@/mock-data";
-import { submitPost } from "@/actions";
+import { submitPost } from "@/actions/actions";
+import { user } from "@/mock/mock-data";
 import { useState } from "react";
 import TextareaAutoSize from "react-textarea-autosize";
 

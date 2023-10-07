@@ -17,15 +17,16 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import React from "react";
 
 export function DesktopNavbar() {
-  let cls = "py-1 group w-full flex justify-center desktop:justify-start";
+  let cls = "py-1 group w-full flex  justify-center desktop:justify-start";
   return (
-    <nav className="hidden h-screen  min-w-[69px] tablet:flex desktop:w-[275px] flex-col  sticky top-0 border-white/20 border-r ">
-      <ul className="flex flex-col items-center desktop:items-start pl-1 sticky top-0 left-0">
+    <Container>
+      <ul className="w-full items-center flex flex-col pt-[.8px] tablet:items-end desktop:items-start  sticky top-0 left-0">
         <Link
           href="/"
-          className="w-fit rounded-full p-4 hover:bg-white/10 ml-2 desktop:ml-0"
+          className="w-full flex rounded-full p-4 justify-center desktop:justify-start hover:bg-white/10 "
         >
           <div className="relative h-[26px] w-[26px]">
             <Image src={"/logo.svg"} alt="logo" fill />
@@ -108,15 +109,31 @@ export function DesktopNavbar() {
           </span>
         </button>
       </ul>
-    </nav>
+    </Container>
   );
 }
+
+const Container = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <nav
+      className={cn(
+        // "border-8 border-green-500",
+        "hidden w-20",
+        "tablet:block",
+        "border-r border-white/20",
+        " desktop:w-[330px]"
+      )}
+    >
+      {children}
+    </nav>
+  );
+};
 
 const Icon = ({ Icon, href }: { Icon: LucideIcon; href: string }) => {
   const pathname = usePathname();
   const active = pathname === href;
   return (
-    <div className="relative group tablet:hover:bg-white/10 active:bg-white/10 desktop:hover:bg-white/0 h-12 w-12 flex items-center justify-center rounded-full desktop:hover:bg-none">
+    <div className="relative group  tablet:hover:bg-white/10 active:bg-white/10 desktop:hover:bg-white/0 h-12 w-12 flex items-center justify-center rounded-full desktop:hover:bg-none">
       <Icon
         size={active ? 30 : 25}
         className={cn("-mt-0.5", {
@@ -132,7 +149,7 @@ const LinkContent = ({ children }: { children: React.ReactNode }) => {
   return (
     <div
       className={cn(
-        "flex gap-[10px] w-fit bg-none desktop:group-hover:bg-white/10 transition-colors rounded-full desktop:pr-8 pl-1 items-center h-[42px]"
+        "flex gap-[10px] w-fit bg-none desktop:group-hover:bg-white/10 transition-colors rounded-full desktop:pr-8 pl-1 items-center h-[52px]"
       )}
     >
       {children}

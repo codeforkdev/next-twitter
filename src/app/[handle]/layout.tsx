@@ -15,7 +15,9 @@ import React from "react";
 import Tabs from "./(tabs)/Tabs";
 import { ScrollInView } from "@/components/ScrollInView";
 import FollowBtn from "./@components/FollowButton";
-import { user as me } from "@/mock/mock-data";
+import { user as me, user } from "@/mock/mock-data";
+import { usePathname } from "next/navigation";
+import { Controls } from "./@components/Controls";
 
 export default async function Layout({
   params,
@@ -63,6 +65,7 @@ export default async function Layout({
       </div>
 
       <Controls
+        handle={me.handle}
         followerId={me.id}
         followingId={user.id}
         isFollowing={isFollowing ? true : false}
@@ -101,38 +104,6 @@ const Bio = ({ user }: { user: typeof users.$inferSelect }) => {
         <span>@{user.handle}</span>
         <span className="bg-white/10 p-1 text-xs">Follows you</span>
       </div>
-    </div>
-  );
-};
-
-export const Controls = ({
-  isFollowing,
-  followerId,
-  followingId,
-}: {
-  isFollowing: boolean;
-  followerId: string;
-  followingId: string;
-}) => {
-  const size = 18;
-  return (
-    <div className="flex justify-end text-gray-200 py-3 pr-4 gap-2">
-      <button className=" border-gray-500 h-8 w-8 rounded-full border flex items-center justify-center">
-        <MoreHorizontal size={size} />
-      </button>
-
-      <button className="border-gray-500 h-8 w-8 rounded-full border flex items-center justify-center">
-        <MailIcon size={size} />
-      </button>
-
-      <button className="border-gray-500 h-8 w-8 rounded-full border flex items-center justify-center">
-        <BellPlusIcon size={size} />
-      </button>
-      <FollowBtn
-        isFollowing={isFollowing}
-        followerId={followerId}
-        followingId={followingId}
-      />
     </div>
   );
 };

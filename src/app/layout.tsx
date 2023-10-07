@@ -28,7 +28,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <Container>
           <DesktopNavbar />
-          <Main>{children}</Main>
+          {children}
+          <LinkTree />
           <MobileNavbar />
         </Container>
         <Modal>{modal}</Modal>
@@ -45,24 +46,16 @@ function Container({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        "flex flex-col mx-auto max-w-[700px]",
-        "tablet:flex-row",
-        "laptop:max-w-[1000px]",
-        "desktop:max-w-[1236px]",
+        "w-full mx-auto ",
+        "tablet:max-w-[700px] tablet:border-green-500",
+        "laptop:max-w-[1000px] laptop:border-red-500",
+        "desktop:max-w-[1258px] desktop:border-blue-500",
         inter.className
       )}
     >
-      {children}
+      <div className={cn("tablet:flex tablet:flex-row")}>{children}</div>
+      <div />
     </div>
-  );
-}
-
-function Main({ children }: { children: React.ReactNode }) {
-  return (
-    <main className="flex-1  relative">
-      {children}
-      <LinkTree />
-    </main>
   );
 }
 

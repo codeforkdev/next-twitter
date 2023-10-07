@@ -1,95 +1,74 @@
 import { db } from "@/drizzle/db";
-import {
-  followings,
-  posts,
-  users,
-  // usersToFollowers,
-  // usersToFollowing,
-} from "@/drizzle/schema";
-import { user } from "@/mock/mock-data";
+import * as schema from "@/drizzle/schema";
+import { user as devUser } from "@/mock/mock-data";
 import { faker } from "@faker-js/faker";
 import { nanoid } from "nanoid";
-function getRandomArbitrary(min: number, max: number) {
-  return Math.random() * (max - min) + min;
-}
 
-type User = typeof users.$inferInsert;
-type Post = typeof posts.$inferInsert;
-type Following = typeof followings.$inferInsert;
-// type UsersToFollowing = typeof usersToFollowing.$inferInsert;
-// type UsersToFollowers = typeof usersToFollowers.$inferInsert;
-type Data = {
-  users: User[];
-  posts: Post[];
-  followings: Following[];
-  // usersToFollowings: UsersToFollowing[];
-  // usersToFollowers: UsersToFollowers[];
-};
-export async function GET(request: Request) {
-  const data: Data = {
-    users: [],
-    posts: [],
-    followings: [],
-    // usersToFollowers: [],
-    // usersToFollowings: [],
-  };
-  faker.seed(1);
+import chalk from "chalk";
 
-  // clean up
-  await db.delete(users);
+type User = typeof schema.users.$inferInsert;
+type Post = typeof schema.posts.$inferInsert;
 
-  // Create Users
+async function seedUsers() {
+  let users: User[] = [devUser];
+
   for (let i = 0; i < 20; i++) {
-    data.users.push({
+    users.push({
       id: nanoid(),
       displayName: faker.person.fullName(),
       handle: faker.person.firstName() + nanoid(),
       avatar: faker.image.avatarGitHub(),
     });
   }
-  data.users.push(user);
-  const newUsers = await db.insert(users).values(data.users).returning();
 
+  try {
+    users = await db.insert(schema.users).values(users).returning();
+    console.log("️✅   Create users");
+    return users;
+  } catch (e) {
+    console.log(chalk.red("⚠️   Error: Create users\n", e));
+    throw new Error("");
+  }
+}
+
+async function seedPosts(users: User[]) {
   // Create posts for each user
-  for (let user of newUsers) {
+  let posts: Post[] = [];
+  for (let user of users) {
     for (let i = 0; i < 10; i++) {
-      data.posts.push({
+      posts.push({
         id: nanoid(),
         userId: user.id,
         text: faker.lorem.lines({ min: 1, max: 3 }),
       });
     }
   }
-  const newPosts = await db.insert(posts).values(data.posts).returning();
+  try {
+    await db.insert(schema.posts).values(posts).returning();
+    console.log("️✅   Create posts");
+  } catch (e) {
+    console.log(chalk.red("⚠️   Error: Create posts\n", e));
+  }
+}
 
-  // Create followings
-  // for (let potentialFollower of newUsers) {
-  //   for (let user of newUsers) {
-  //     const randomNumber = getRandomArbitrary(1, 10);
-  //     if (randomNumber < 4) {
-  //       data.followings.push({
-  //         id: nanoid(),
-  //         followerId: potentialFollower.id,
-  //         followingId: user.id,
-  //       });
+async function clearTables() {
+  try {
+    await db.delete(schema.users);
+    console.log("️✅   Clear tables");
+  } catch (e) {
+    console.log(chalk.red("⚠️   Error: Deleting users\n", e));
+  }
+}
 
-  //       data.usersToFollowers.push({
-  //         userId: user.id,
-  //         followerId: potentialFollower.id,
-  //       });
+export async function GET(request: Request) {
+  console.log(chalk.cyan("Start seeding"));
 
-  //       data.usersToFollowings.push({
-  //         userId: potentialFollower.id,
-  //         followingId: user.id,
-  //       });
-  //     }
-  //   }
-  // }
+  faker.seed(1);
 
-  // await db.insert(followings).values(data.followings);
+  await clearTables();
+  const users = await seedUsers();
+  const posts = await seedPosts(users);
 
-  // await db.insert(usersToFollowers).values(data.usersToFollowers);
-  // await db.insert(usersToFollowing).values(data.usersToFollowings);
-
-  return Response.json({ newUsers });
+  console.log(chalk.green("Done seeding"));
+  return Response.json({ users, posts });
 }

@@ -116,9 +116,7 @@ export const usersRelations = relations(users, ({ many }) => ({
 
 export const followings = sqliteTable("following", {
   id: text("id").primaryKey().notNull(),
-  followerId: text("follower_id")
-    .notNull()
-    .references(() => users.id),
+  followerId: text("follower_id").notNull(),
   followingId: text("following_id").notNull(),
 });
 

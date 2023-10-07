@@ -3,6 +3,7 @@ import { bookmarks } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { db } from "@/drizzle/db";
 import { user } from "@/mock/mock-data";
+import PostForm from "@/components/PostForm";
 export default async function Home() {
   try {
     const posts = await db.query.posts.findMany({
@@ -25,7 +26,7 @@ export default async function Home() {
 
     return (
       <div>
-        {/* <PostForm /> */}
+        <PostForm />
         <ul>
           {posts?.map((post) => (
             <li key={post.id}>

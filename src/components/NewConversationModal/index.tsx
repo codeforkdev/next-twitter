@@ -1,8 +1,8 @@
 "use client";
-import { createConversation, searchUsers } from "@/actions";
-import { useDebounce } from "@/hooks";
+import { createConversation, searchUsers } from "@/actions/actions";
+import { useDebounce } from "@/hooks/hooks";
 import { cn } from "@/lib/utils";
-import { user } from "@/mock-data";
+import { user } from "@/mock/mock-data";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Check, Plus, Search, Users, X } from "lucide-react";
 import { ChangeEvent, useRef, useState } from "react";

@@ -22,10 +22,9 @@ export default async function Home() {
     },
   });
 
-  console.log(posts);
   return (
-    <ol className="flex flex-col">
-      {posts?.map((post) => (
+    <ol>
+      {posts.map((post) => (
         <li className="border-b border-white/20 py-3 px-4 ">
           <Post {...post} isBookmarked={post.bookmarks.length !== 0} />
         </li>
