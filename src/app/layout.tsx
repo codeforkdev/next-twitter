@@ -24,8 +24,8 @@ export default function RootLayout({
   modal: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full">
-      <body className={inter.className}>
+    <html lang="en">
+      <body className={inter.className + " h-full "}>
         <Container>
           <DesktopNavbar />
           {children}
@@ -46,15 +46,14 @@ function Container({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        "w-full mx-auto ",
-        "tablet:max-w-[700px] tablet:border-green-500",
+        "w-full mx-auto h-full",
+        "tablet:max-w-[700px] tablet:flex tablet:flex-row tablet:border-green-500",
         "laptop:max-w-[1000px] laptop:border-red-500",
         "desktop:max-w-[1258px] desktop:border-blue-500",
         inter.className
       )}
     >
-      <div className={cn("tablet:flex tablet:flex-row")}>{children}</div>
-      <div />
+      {children}
     </div>
   );
 }

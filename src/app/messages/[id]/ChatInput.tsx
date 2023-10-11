@@ -1,5 +1,6 @@
 "use client";
-import { createMessage } from "@/actions";
+import { createMessage } from "@/actions/actions";
+import { ImagePlusIcon, Send } from "lucide-react";
 import usePartySocket from "partysocket/react";
 import { ChangeEvent, useEffect, useState } from "react";
 
@@ -40,15 +41,24 @@ export default function ChatInput({
     });
   };
   return (
-    <div className="flex">
-      <input
-        className="w-full flex-1 border text-black"
-        onChange={handleInput}
-        value={value}
-      />
-      <button className="p-2" onClick={handleSendMessage}>
-        Send
-      </button>
+    <div className="p-2">
+      <div className="flex items-center gap-4 rounded-xl bg-white/10 px-4 py-1">
+        <ImagePlusIcon size={18} className="text-primary" />
+        <div className="flex flex-1">
+          <input
+            className="flex-1 bg-transparent p-2 text-white outline-none"
+            placeholder="Start a new message"
+            onChange={handleInput}
+            value={value}
+          />
+          <button
+            className="rotate-45 p-2 text-primary"
+            onClick={handleSendMessage}
+          >
+            <Send size={16} />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

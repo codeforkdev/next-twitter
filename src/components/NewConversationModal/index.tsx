@@ -4,7 +4,7 @@ import { useDebounce } from "@/hooks/hooks";
 import { cn } from "@/lib/utils";
 import { user } from "@/mock/mock-data";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Check, Plus, Search, Users, X } from "lucide-react";
+import { Check, MailPlusIcon, Plus, Search, Users, X } from "lucide-react";
 import { ChangeEvent, useRef, useState } from "react";
 type User = {
   id: string;
@@ -62,11 +62,11 @@ export default function NewConversationModal() {
   return (
     <Dialog.Root onOpenChange={setOpen} open={open}>
       <Dialog.Trigger>
-        <Plus />
+        <MailPlusIcon size={20} />
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="bg-gray-500/30 z-50 fixed inset-0" />
-        <Dialog.Content className="z-50 min-h-[50%] rounded-xl fixed left-1/2 top-[33%] -translate-x-1/2 -translate-y-1/2 max-w-xl w-full bg-slate-950">
+        <Dialog.Content className="z-50 flex flex-col h-[650px] rounded-xl fixed left-1/2 top-[43%] -translate-x-1/2 -translate-y-1/2 max-w-xl w-full bg-slate-950">
           <div className="flex items-center gap-10 p-4">
             <Dialog.Close>
               <X />
@@ -126,7 +126,7 @@ export default function NewConversationModal() {
             </button>
           )}
 
-          <ul>
+          <ul className="flex-1 overflow-y-auto">
             {fetchedUsers.map((user) => {
               const isParticipant = getParticipant(user.id) ? true : false;
               return (

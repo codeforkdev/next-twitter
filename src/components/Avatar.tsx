@@ -1,7 +1,16 @@
+import { cn } from "@/lib/utils";
 import Image from "next/image";
-export const Avatar = ({ src }: { src: string }) => {
+export const Avatar = ({
+  src,
+  className,
+}: {
+  src: string;
+  className?: string;
+}) => {
   return (
-    <div className="h-8 w-8 rounded-full overflow-clip relative">
+    <div
+      className={cn("relative h-8 w-8 overflow-clip rounded-full", className)}
+    >
       <Image src={src} alt="avatar" fill />
     </div>
   );

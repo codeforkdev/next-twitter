@@ -17,22 +17,18 @@ import {
   MapPin,
 } from "lucide-react";
 
-export const Thing = ({
-  header,
-  page,
+export const MainLayout = ({
+  main,
   aside,
 }: {
-  header: React.ReactNode;
-  page: React.ReactNode;
+  main: React.ReactNode;
   aside: React.ReactNode;
 }) => {
   return (
-    <div className="w-full flex ">
+    <div className="w-full flex h-full">
       <main className="max-w-[600px] shrink-0 w-full border-r border-white/20">
-        {header}
-        {page}
+        {main}
       </main>
-
       <aside className="hidden h-screen  sticky flex-1 top-0 py-3 px-5 laptop:flex flex-col gap-3">
         {aside}
       </aside>
@@ -41,7 +37,17 @@ export const Thing = ({
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <Thing header={<Header />} page={children} aside={<Aside />} />;
+  return (
+    <MainLayout
+      main={
+        <>
+          <Header />
+          {children}
+        </>
+      }
+      aside={<Aside />}
+    />
+  );
 }
 
 function Header() {
@@ -59,13 +65,14 @@ function Header() {
 
             {/* Profile Avatar */}
             <div className="flex-1 pl-4 pt-[10px]">
-              <div className="h-8 w-8 rounded-full overflow-clip relative ">
+              <div className="h-8 w-8 tablet:hidden rounded-full overflow-clip relative ">
                 <Image
                   src="https://avatars.githubusercontent.com/u/142317935?v=4"
                   alt=""
                   fill
                 />
               </div>
+              <p className="font-bold text-xl text-gray-200">Home</p>
             </div>
 
             {/* Logo */}
@@ -130,7 +137,7 @@ function Header() {
       </Slide>
 
       <div className="hidden tablet:flex min-h-[16rem] px-3 py-2 gap-4 border-b border-white/20">
-        <Avatar src={user.avatar} className="h-12 w-12" />
+        <Avatar src={user.avatar} className="h-10 w-10" />
         <div className="flex-1">
           <button className=" text-primary text-sm border border-blue-300/50 rounded-full px-3 py-[1px] flex items-center gap-[2px] w-fit">
             <span className="font-semibold">Everyone</span>
@@ -173,13 +180,13 @@ function Header() {
 }
 const Avatar = ({ src, className }: { src: string; className: string }) => {
   return (
-    <div className={cn(" rounded-full overflow-clip relative ", className)}>
+    <div className={cn(" rounded-full overflow-clip relative mt-2", className)}>
       <Image src={src} alt="avatar" fill />
     </div>
   );
 };
 
-function Aside() {
+export function Aside() {
   return (
     <>
       <div className="relative">

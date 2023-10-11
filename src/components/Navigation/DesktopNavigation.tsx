@@ -23,7 +23,7 @@ export function DesktopNavbar() {
   let cls = "py-1 group w-full flex  justify-center desktop:justify-start";
   return (
     <Container>
-      <ul className="w-full items-center flex flex-col pt-[.8px] tablet:items-end desktop:items-start  sticky top-0 left-0">
+      <ul className="w-full items-center flex flex-col pt-[.3px] tablet:items-center desktop:items-start  sticky top-0 left-0">
         <Link
           href="/"
           className="w-full flex rounded-full p-4 justify-center desktop:justify-start hover:bg-white/10 "
@@ -101,8 +101,8 @@ export function DesktopNavbar() {
             </div>
           </LinkContent>
         </Link>
-        <div className="mt-2" />
-        <button className="py-[13.5px] hover:bg-white/10 rounded-full text-[17px] h-[52px] w-[52px] flex items-center justify-center desktop:w-full bg-primary max-w-[232px] font-semibold">
+        <div className="mt-4" />
+        <button className="py-[13.5px] hover:bg-white/10 rounded-full text-[17px] h-[52px] w-[50px] flex items-center justify-center desktop:w-full bg-primary max-w-[232px] font-semibold">
           <span className="hidden desktop:block">Post</span>
           <span className="desktop:hidden ">
             <Feather />
@@ -118,10 +118,10 @@ const Container = ({ children }: { children: React.ReactNode }) => {
     <nav
       className={cn(
         // "border-8 border-green-500",
-        "hidden w-20",
-        "tablet:block",
+        "hidden w-[100px] ",
+        "tablet:block h-[100dvh] sticky top-0",
         "border-r border-white/20",
-        " desktop:w-[330px]"
+        "desktop:w-[348px]"
       )}
     >
       {children}
@@ -135,7 +135,7 @@ const Icon = ({ Icon, href }: { Icon: LucideIcon; href: string }) => {
   return (
     <div className="relative group  tablet:hover:bg-white/10 active:bg-white/10 desktop:hover:bg-white/0 h-12 w-12 flex items-center justify-center rounded-full desktop:hover:bg-none">
       <Icon
-        size={active ? 30 : 25}
+        size={active ? 30 : 24}
         className={cn("-mt-0.5", {
           "fill-white stroke-black": active && href !== "/explore",
           "stroke-3": href === "/explore",
@@ -149,7 +149,7 @@ const LinkContent = ({ children }: { children: React.ReactNode }) => {
   return (
     <div
       className={cn(
-        "flex gap-[10px] w-fit bg-none desktop:group-hover:bg-white/10 transition-colors rounded-full desktop:pr-8 pl-1 items-center h-[52px]"
+        "flex gap-[10px] w-fit bg-none desktop:group-hover:bg-white/10 transition-colors rounded-full desktop:pr-8 pl-1 items-center h-[50px]"
       )}
     >
       {children}
@@ -167,7 +167,7 @@ const Label = ({
   const pathname = usePathname();
   return (
     <span
-      className={cn("hidden desktop:block text-slate-100 text-[20px]", {
+      className={cn("hidden desktop:block text-slate-100 text-[19.5px]", {
         "font-semibold text-white": href === pathname,
       })}
     >

@@ -124,7 +124,7 @@ export default function Post({
           >
             <BarChart2 size={18} />
           </button>
-          <button
+          {/* <button
             className={cn({
               // "bg-gray-500": !liked,
               "bg-pink-500": liked,
@@ -139,19 +139,19 @@ export default function Post({
             }}
           >
             <Share size={18} />
+          </button> */}
+          <button
+            className={cn({
+              "bg-gray-500": !isBookmarked,
+              "bg-green-500": isBookmarked,
+            })}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleBookmark({ userId: user.id, postId: id, isBookmarked });
+            }}
+          >
+            Bookmark
           </button>
-          {/* <button
-              className={cn({
-                "bg-gray-500": !isBookmarked,
-                "bg-green-500": isBookmarked,
-              })}
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleBookmark({ userId: user.id, postId: id, isBookmarked });
-              }}
-            >
-              Bookmark
-            </button> */}
         </div>
       </div>
     </div>

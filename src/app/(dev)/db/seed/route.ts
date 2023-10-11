@@ -16,7 +16,7 @@ async function seedUsers() {
     users.push({
       id: nanoid(),
       displayName: faker.person.fullName(),
-      handle: faker.person.firstName() + nanoid(),
+      handle: faker.person.firstName(),
       avatar: faker.image.avatarGitHub(),
     });
   }
@@ -53,6 +53,7 @@ async function seedPosts(users: User[]) {
 
 async function clearTables() {
   try {
+    await db.delete(schema.conversations);
     await db.delete(schema.users);
     console.log("️✅   Clear tables");
   } catch (e) {

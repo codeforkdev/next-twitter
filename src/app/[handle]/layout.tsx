@@ -18,6 +18,7 @@ import FollowBtn from "./@components/FollowButton";
 import { user as me, user } from "@/mock/mock-data";
 import { usePathname } from "next/navigation";
 import { Controls } from "./@components/Controls";
+import { Aside, MainLayout } from "../home/layout";
 
 export default async function Layout({
   params,
@@ -46,45 +47,59 @@ export default async function Layout({
   console.log(isFollowing);
   return (
     <>
-      <Header>
-        <BackButton>
-          <ArrowLeft size={20} />
-        </BackButton>
-        <div className="flex flex-col">
-          <h2 className="font-bold text-gray-300">{user.displayName}</h2>
-          <p className="text-sm text-gray-400">{user.posts.length} posts</p>
-        </div>
-      </Header>
-
-      <div className="relative">
-        <Banner src={faker.image.urlLoremFlickr({ category: "nature" })} />
-        <Avatar
-          src={user.avatar ?? ""}
-          className="absolute -translate-y-1/2 left-4"
-        />
-      </div>
-
-      <Controls
-        handle={me.handle}
-        followerId={me.id}
-        followingId={user.id}
-        isFollowing={isFollowing ? true : false}
+      <MainLayout
+        main={
+          <>
+            <Header
+              displayName={user.displayName}
+              numOfPosts={user.posts.length}
+            />
+            <div className="relative">
+              <Banner
+                src={faker.image.urlLoremFlickr({ category: "nature" })}
+              />
+              <Avatar
+                src={user.avatar ?? ""}
+                className="absolute -translate-y-1/2 left-4"
+              />
+            </div>
+            <Controls
+              handle={me.handle}
+              followerId={me.id}
+              followingId={user.id}
+              isFollowing={isFollowing ? true : false}
+            />
+            <Bio user={user} />
+            <Tabs handle={user.handle} />
+            {children}
+          </>
+        }
+        aside={<Aside />}
       />
-      <Bio user={user} />
-      <Tabs handle={user.handle} />
-      {children}
     </>
   );
 }
 
-const Header = ({ children }: { children: React.ReactNode }) => {
+const Header = ({
+  displayName,
+  numOfPosts,
+}: {
+  displayName: string;
+  numOfPosts: number;
+}) => {
   return (
     <ScrollInView top={-50} className="z-50 sticky">
       <header
         className="flex items-center py-[5px] px-6 gap-10 bg-black/70"
         style={{ backdropFilter: "blur(10px)" }}
       >
-        {children}
+        <BackButton>
+          <ArrowLeft size={20} />
+        </BackButton>
+        <div className="flex flex-col">
+          <h2 className="font-bold text-gray-300">{displayName}</h2>
+          <p className="text-sm text-gray-400">{numOfPosts} posts</p>
+        </div>
 
         {/* <button className="border-gray-500  h-8 border rounded-full px-4 tracking-wide ml-auto font-semibold">
             Follow

@@ -4,5 +4,9 @@
 
 html,
 body {
-  @apply h-full bg-black text-white;
+  @apply bg-black text-white;
+}
+
+html {
+  scrollbar-gutter: stable;
 }
