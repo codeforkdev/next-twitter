@@ -18,15 +18,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
+import { Avatar } from "../Avatar";
 
 export function DesktopNavbar() {
   let cls = "py-1 group w-full flex  justify-center desktop:justify-start";
   return (
     <Container>
-      <ul className="w-full items-center flex flex-col pt-[.3px] tablet:items-center desktop:items-start  sticky top-0 left-0">
+      <ul className="sticky left-0 top-0 flex h-full w-full flex-col items-center  pt-[.3px] tablet:items-center desktop:items-start">
         <Link
           href="/"
-          className="w-full flex rounded-full p-4 justify-center desktop:justify-start hover:bg-white/10 "
+          className="w-fit rounded-full p-4 hover:bg-white/10 desktop:justify-start "
         >
           <div className="relative h-[26px] w-[26px]">
             <Image src={"/logo.svg"} alt="logo" fill />
@@ -76,7 +77,7 @@ export function DesktopNavbar() {
         </Link>
         <Link href="/premium" className={cls}>
           <LinkContent>
-            <div className="flex desktop:ml-3 gap-5">
+            <div className="flex gap-5 desktop:ml-3">
               <div className="relative h-6 w-6">
                 <Image src={"/logo.svg"} alt="logo" fill />
               </div>
@@ -93,21 +94,36 @@ export function DesktopNavbar() {
         </Link>
         <Link href={"/" + user.handle} className={cls}>
           <LinkContent>
-            <div className=" flex desktop:ml-3 gap-5">
-              <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center ">
+            <div className=" flex gap-5 desktop:ml-3">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 ">
                 <MoreHorizontal size={18} />
               </div>
               <Label href={"/" + user.handle}>More</Label>
             </div>
           </LinkContent>
         </Link>
-        <div className="mt-4" />
-        <button className="py-[13.5px] hover:bg-white/10 rounded-full text-[17px] h-[52px] w-[50px] flex items-center justify-center desktop:w-full bg-primary max-w-[232px] font-semibold">
+        <div className=" mt-4" />
+        <button className="flex h-[52px] w-[50px] max-w-[232px] items-center justify-center rounded-full bg-primary py-[13.5px] text-[17px] font-semibold hover:bg-primary/90 desktop:w-full">
           <span className="hidden desktop:block">Post</span>
           <span className="desktop:hidden ">
             <Feather />
           </span>
         </button>
+
+        <div className="mt-auto w-full ">
+          <button className="flex w-full justify-center rounded-full p-3 hover:bg-white/10 desktop:justify-start desktop:p-4 desktop:pl-0">
+            <div className="flex  items-center gap-2">
+              <Avatar src={user.avatar} className="h-12 w-12 shrink-0" />
+              <div className="hidden flex-col desktop:flex ">
+                <div className="font-bold">{user.displayName}</div>
+                <div className="text-sm text-white/50">@{user.handle}</div>
+              </div>
+              <div className="ml-auto hidden desktop:block">
+                <MoreHorizontal size={20} />
+              </div>
+            </div>
+          </button>
+        </div>
       </ul>
     </Container>
   );
@@ -119,9 +135,9 @@ const Container = ({ children }: { children: React.ReactNode }) => {
       className={cn(
         // "border-8 border-green-500",
         "hidden w-[100px] ",
-        "tablet:block h-[100dvh] sticky top-0",
+        "sticky top-0 h-[100dvh] tablet:block",
         "border-r border-white/20",
-        "desktop:w-[348px]"
+        "desktop:w-[348px]",
       )}
     >
       {children}
@@ -133,7 +149,7 @@ const Icon = ({ Icon, href }: { Icon: LucideIcon; href: string }) => {
   const pathname = usePathname();
   const active = pathname === href;
   return (
-    <div className="relative group  tablet:hover:bg-white/10 active:bg-white/10 desktop:hover:bg-white/0 h-12 w-12 flex items-center justify-center rounded-full desktop:hover:bg-none">
+    <div className="group relative  flex h-12 w-12 items-center justify-center rounded-full active:bg-white/10 tablet:hover:bg-white/10 desktop:hover:bg-white/0 desktop:hover:bg-none">
       <Icon
         size={active ? 30 : 24}
         className={cn("-mt-0.5", {
@@ -149,7 +165,7 @@ const LinkContent = ({ children }: { children: React.ReactNode }) => {
   return (
     <div
       className={cn(
-        "flex gap-[10px] w-fit bg-none desktop:group-hover:bg-white/10 transition-colors rounded-full desktop:pr-8 pl-1 items-center h-[50px]"
+        "flex h-[50px] w-fit items-center gap-[10px] rounded-full bg-none pl-1 transition-colors desktop:pr-8 desktop:group-hover:bg-white/10",
       )}
     >
       {children}
@@ -167,7 +183,7 @@ const Label = ({
   const pathname = usePathname();
   return (
     <span
-      className={cn("hidden desktop:block text-slate-100 text-[19.5px]", {
+      className={cn("hidden text-[19.5px] text-slate-100 desktop:block", {
         "font-semibold text-white": href === pathname,
       })}
     >

@@ -1,10 +1,13 @@
+import { drizzle } from "drizzle-orm/planetscale-serverless";
+import { Config, connect } from "@planetscale/database";
 import * as schema from "./schema";
-import { drizzle } from "drizzle-orm/libsql";
-import { createClient } from "@libsql/client";
+const config = {
+  host: process.env.DATABASE_HOST,
+  username: process.env.DATABASE_USERNAME,
+  password: process.env.DATABASE_PASSWORD,
+} satisfies Config;
 
-const client = createClient({
-  url: "libsql://next-twitter-codeforkdev.turso.io",
-  authToken: process.env.DB_TOKEN,
-});
+console.log("connecting to planetscale");
+const connection = connect(config);
 
-export const db = drizzle(client, { schema });
+export const db = drizzle(connection, { schema });

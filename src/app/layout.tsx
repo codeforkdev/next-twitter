@@ -1,13 +1,8 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { cn } from "@/lib/utils";
 
-import Link from "next/link";
-import { Sparkles } from "lucide-react";
 import React from "react";
-import { DesktopNavbar } from "@/components/Navigation/DesktopNavigation";
-import { MobileNavbar } from "@/components/Navigation/MobileNavigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,14 +19,9 @@ export default function RootLayout({
   modal: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <body className={inter.className + " h-full "}>
-        <Container>
-          <DesktopNavbar />
-          {children}
-          <LinkTree />
-          <MobileNavbar />
-        </Container>
+        {children}
         <Modal>{modal}</Modal>
       </body>
     </html>
@@ -40,32 +30,4 @@ export default function RootLayout({
 
 function Modal({ children }: { children: React.ReactNode }) {
   return <div className="z-[9999]">{children}</div>;
-}
-
-function Container({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      className={cn(
-        "w-full mx-auto h-full",
-        "tablet:max-w-[700px] tablet:flex tablet:flex-row tablet:border-green-500",
-        "laptop:max-w-[1000px] laptop:border-red-500",
-        "desktop:max-w-[1258px] desktop:border-blue-500",
-        inter.className
-      )}
-    >
-      {children}
-    </div>
-  );
-}
-
-function LinkTree() {
-  return (
-    <div className="fixed right-0 top-20 text-white z-[999]">
-      <Link href="https://github.com/codeforkdev/next-twitter" target="_blank">
-        <div className="rounded-l-full h-8 w-10 pl-3 flex items-center bg-indigo-500">
-          <Sparkles size={18} />
-        </div>
-      </Link>
-    </div>
-  );
 }

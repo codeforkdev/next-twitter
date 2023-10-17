@@ -1,15 +1,38 @@
-import { sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
-import { Many, relations } from "drizzle-orm";
-import { user } from "@/mock/mock-data";
+// import {
+//   integer,
+//   mysqlTable,
+//   varchar,
+//   uniqueIndex,
+// } from "drizzle-orm/sqlite-core";
+// import { relations, sql } from "drizzle-orm";
 
-export const bookmarks = sqliteTable("bookmarks", {
-  id: text("id").primaryKey().notNull(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  postId: text("post_id")
-    .notNull()
-    .references(() => posts.id, { onDelete: "cascade" }),
+import { isNull, relations, sql } from "drizzle-orm";
+import { char, mysqlTable, timestamp, varchar } from "drizzle-orm/mysql-core";
+
+export const id = varchar("id", { length: 21 }).primaryKey().notNull();
+
+export const createdAt = timestamp("created_at", { mode: "date" })
+  .notNull()
+  .defaultNow();
+export const users = mysqlTable("users", {
+  id,
+  handle: varchar("handle", { length: 21 }).notNull(),
+  avatar: varchar("avatar", { length: 500 }),
+  displayName: varchar("display_name", { length: 52 }).notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+});
+
+export const usersRelations = relations(users, ({ many }) => ({
+  posts: many(posts),
+  bookmarks: many(bookmarks),
+  likes: many(likes),
+  conversationParticipants: many(conversationParticipants),
+}));
+
+export const bookmarks = mysqlTable("bookmarks", {
+  id,
+  userId: char("user_id", { length: 21 }).notNull(),
+  postId: varchar("post_id", { length: 21 }).notNull(),
 });
 
 export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
@@ -23,26 +46,11 @@ export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
   }),
 }));
 
-export const likes = sqliteTable(
-  "likes",
-  {
-    id: text("id").primaryKey().notNull(),
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    postId: text("post_id")
-      .notNull()
-      .references(() => posts.id, { onDelete: "cascade" }),
-  },
-  (table) => {
-    return {
-      handleUnique: uniqueIndex("likes_user_post_unique").on(
-        table.userId,
-        table.postId,
-      ),
-    };
-  },
-);
+export const likes = mysqlTable("likes", {
+  id,
+  userId: varchar("user_id", { length: 21 }).notNull(),
+  postId: varchar("post_id", { length: 21 }).notNull(),
+});
 
 export const likesRelations = relations(likes, ({ one }) => ({
   user: one(users, {
@@ -55,12 +63,16 @@ export const likesRelations = relations(likes, ({ one }) => ({
   }),
 }));
 
-export const posts = sqliteTable("posts", {
-  id: text("id").primaryKey().notNull(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  text: text("text").notNull(),
+export const posts = mysqlTable("posts", {
+  id,
+  parentId: char("parent_id", { length: 21 }),
+  userId: char("user_id", { length: 21 }).notNull(),
+  text: varchar("text", { length: 500 }).notNull(),
+  createdAt,
+});
+
+export const postReplies = mysqlTable("post_replies", {
+  id,
 });
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -72,27 +84,23 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
   likes: many(likes),
 }));
 
-export const conversations = sqliteTable("conversation", {
-  id: text("id").primaryKey().notNull(),
+export const conversations = mysqlTable("conversation", {
+  id,
 });
 
-export const conversationRelations = relations(
-  conversations,
-  ({ one, many }) => ({
-    participants: many(conversationParticipants),
-    messages: many(conversationMessages),
-  }),
-);
+export const conversationRelations = relations(conversations, ({ many }) => ({
+  participants: many(conversationParticipants),
+  messages: many(conversationMessages),
+}));
 
-export const conversationMessages = sqliteTable("conversation_messages", {
-  id: text("id").primaryKey().notNull(),
-  conversationId: text("conversation_id")
-    .notNull()
-    .references(() => conversations.id, { onDelete: "cascade" }),
-  conversationParticipantId: text("conversation_participant_id")
-    .notNull()
-    .references(() => conversationParticipants.id, { onDelete: "cascade" }),
-  text: text("text").notNull(),
+export const conversationMessages = mysqlTable("conversation_messages", {
+  id,
+  conversationId: varchar("conversation_id", { length: 21 }).notNull(),
+  participantId: varchar("conversation_participant_id", {
+    length: 21,
+  }).notNull(),
+  text: varchar("varchar", { length: 1000 }).notNull(),
+  createdAt,
 });
 
 export const conversationMessagesRelations = relations(
@@ -103,22 +111,18 @@ export const conversationMessagesRelations = relations(
       references: [conversations.id],
     }),
     participant: one(conversationParticipants, {
-      fields: [conversationMessages.conversationParticipantId],
+      fields: [conversationMessages.participantId],
       references: [conversationParticipants.id],
     }),
   }),
 );
 
-export const conversationParticipants = sqliteTable(
+export const conversationParticipants = mysqlTable(
   "conversation_participants",
   {
-    id: text("id").primaryKey().notNull(),
-    conversationId: text("conversation_id")
-      .notNull()
-      .references(() => conversations.id, { onDelete: "cascade" }),
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
+    id,
+    conversationId: char("conversation_id", { length: 21 }).notNull(),
+    userId: char("user_id", { length: 21 }).notNull(),
   },
 );
 
@@ -136,31 +140,8 @@ export const conversationParticipantsRelations = relations(
     messges: many(conversationMessages),
   }),
 );
-
-export const users = sqliteTable(
-  "users",
-  {
-    id: text("id").primaryKey().notNull(),
-    handle: text("handle").notNull(),
-    avatar: text("avatar"),
-    displayName: text("display_name").notNull(),
-  },
-  (table) => {
-    return {
-      handleUnique: uniqueIndex("users_handle_unique").on(table.handle),
-    };
-  },
-);
-
-export const usersRelations = relations(users, ({ many }) => ({
-  posts: many(posts),
-  bookmarks: many(bookmarks),
-  likes: many(likes),
-  conversationParticipants: many(conversationParticipants),
-}));
-
-export const followings = sqliteTable("following", {
-  id: text("id").primaryKey().notNull(),
-  followerId: text("follower_id").notNull(),
-  followingId: text("following_id").notNull(),
+export const followings = mysqlTable("following", {
+  id,
+  followerId: varchar("follower_id", { length: 21 }).notNull(),
+  followingId: varchar("following_id", { length: 21 }).notNull(),
 });

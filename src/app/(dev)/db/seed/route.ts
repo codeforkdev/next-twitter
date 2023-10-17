@@ -1,5 +1,5 @@
-import { db } from "@/drizzle/db";
-import * as schema from "@/drizzle/schema";
+import { db } from "../../../../drizzle/db";
+import * as schema from "../../../../drizzle/schema";
 import { user as devUser } from "@/mock/mock-data";
 import { faker } from "@faker-js/faker";
 import { nanoid } from "nanoid";
@@ -12,7 +12,7 @@ type Post = typeof schema.posts.$inferInsert;
 async function seedUsers() {
   let users: User[] = [devUser];
 
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 5; i++) {
     users.push({
       id: nanoid(),
       displayName: faker.person.fullName(),
@@ -22,7 +22,8 @@ async function seedUsers() {
   }
 
   try {
-    users = await db.insert(schema.users).values(users).returning();
+    await db.insert(schema.users).values(users);
+    users = await db.query.users.findMany();
     console.log("️✅   Create users");
     return users;
   } catch (e) {
@@ -35,7 +36,7 @@ async function seedPosts(users: User[]) {
   // Create posts for each user
   let posts: Post[] = [];
   for (let user of users) {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 2; i++) {
       posts.push({
         id: nanoid(),
         userId: user.id,
@@ -44,7 +45,8 @@ async function seedPosts(users: User[]) {
     }
   }
   try {
-    await db.insert(schema.posts).values(posts).returning();
+    await db.insert(schema.posts).values(posts);
+    posts = await db.query.posts.findMany();
     console.log("️✅   Create posts");
   } catch (e) {
     console.log(chalk.red("⚠️   Error: Create posts\n", e));
@@ -54,6 +56,7 @@ async function seedPosts(users: User[]) {
 async function clearTables() {
   try {
     await db.delete(schema.conversations);
+    await db.delete(schema.posts);
     await db.delete(schema.users);
     console.log("️✅   Clear tables");
   } catch (e) {
@@ -67,9 +70,10 @@ export async function GET(request: Request) {
   faker.seed(1);
 
   await clearTables();
-  const users = await seedUsers();
-  const posts = await seedPosts(users);
+  let users = await seedUsers();
+  let posts = await seedPosts(users);
 
   console.log(chalk.green("Done seeding"));
+  // return {};
   return Response.json({ users, posts });
 }
