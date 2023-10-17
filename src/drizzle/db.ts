@@ -1,12 +1,13 @@
+import { drizzle } from "drizzle-orm/planetscale-serverless";
+import { Config, connect } from "@planetscale/database";
 import * as schema from "./schema";
-import { drizzle } from "drizzle-orm/mysql2";
-import mysql from "mysql2/promise";
+const config = {
+  host: process.env.DATABASE_HOST,
+  username: process.env.DATABASE_USERNAME,
+  password: process.env.DATABASE_PASSWORD,
+} satisfies Config;
 
-const poolConnection = mysql.createPool({
-  host: "containers-us-west-79.railway.app",
-  user: "root",
-  database: "railway",
-  uri: process.env.DB_URL,
-});
+console.log("connecting to planetscale");
+const connection = connect(config);
 
-export const db = drizzle(poolConnection, { schema, mode: "default" });
+export const db = drizzle(connection, { schema });
