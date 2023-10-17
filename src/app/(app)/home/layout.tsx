@@ -7,6 +7,7 @@ import { PostForm } from "./@components/PostForm";
 import { Avatar } from "@/components/Avatar";
 import { ScrollInView } from "@/components/ScrollInView";
 import Tab from "./@components/Tab";
+import MobileSideNavToggle from "@/components/Navigation/MobileSideNavToggle";
 
 export const MainLayout = ({
   main,
@@ -69,9 +70,7 @@ function Header() {
             </h1>
 
             {/* Profile Avatar */}
-            <div className="flex-1  tablet:hidden">
-              <Avatar src={user.avatar} />
-            </div>
+            <MobileSideNavToggle />
 
             {/* Logo */}
             <div className="-ml-4 tablet:hidden">

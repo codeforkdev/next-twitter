@@ -6,7 +6,7 @@
 .pnp.js
 
 
-/drizzle.config.ts
+drizzle.config.ts
 
 # testing
 /coverage
