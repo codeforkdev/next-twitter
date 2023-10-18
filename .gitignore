@@ -5,9 +5,9 @@
 /.pnp
 .pnp.js
 
+.partykit
 
 drizzle.config.ts
-
 # testing
 /coverage
 

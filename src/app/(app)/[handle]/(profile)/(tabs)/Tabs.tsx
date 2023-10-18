@@ -17,8 +17,8 @@ const Tab = ({
     <li className="flex flex-col gap-2">
       <Link
         href={href}
-        className={cn("text-gray-400", {
-          "text-white font-semibold": active,
+        className={cn("px-1 text-gray-400", {
+          "font-semibold text-white": active,
         })}
       >
         {children}
@@ -37,7 +37,7 @@ export default function Tabs({ handle }: { handle: string }) {
   const base = "/" + handle;
   const isActive = (endpoint: string) => pathname.endsWith(endpoint);
   return (
-    <ul className="flex justify-around border-b border-b-white/20">
+    <ul className="flex justify-around border-b border-b-white/20 px-2">
       <Tab active={isActive("/" + handle)} href={base + "/"}>
         Posts
       </Tab>

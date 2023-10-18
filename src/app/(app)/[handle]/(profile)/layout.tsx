@@ -57,7 +57,7 @@ export default async function Layout({
             <Banner src={faker.image.urlLoremFlickr({ category: "nature" })} />
             <Avatar
               src={user.avatar ?? ""}
-              className="absolute left-4 h-[140px] w-[140px] -translate-y-1/2 overflow-clip rounded-full border-[4px] border-black"
+              className="absolute left-4 h-20 w-20 -translate-y-1/2 overflow-clip rounded-full border-[4px] border-black tablet:h-[140px] tablet:w-[140px]"
             />
           </div>
           <Controls
@@ -66,17 +66,20 @@ export default async function Layout({
             followingId={user.id}
             isFollowing={isFollowing ? true : false}
           />
-          <Spacer className="my-4" />
+          <Spacer className="my-1" />
           <Bio user={user} />
-          <Spacer className="my-8" />
-          <div className="flex gap-4">
+          <Spacer className="my-3" />
+          <div className="flex gap-4 px-5 text-sm">
             <div>
               {following.length}{" "}
-              <span className="white/50 text-sm">Following</span>
+              <span className="text-sm text-white/50">Following</span>
             </div>
-            <div>{followers.length} Following</div>
+            <div>
+              {followers.length}{" "}
+              <span className="text-white/50">Following</span>
+            </div>
           </div>
-
+          <Spacer className="my-8" />
           <Tabs handle={user.handle} />
           {children}
         </>
@@ -144,7 +147,7 @@ const Bio = ({ user }: { user: typeof users.$inferSelect }) => {
 
 const Banner = ({ src }: { src: string }) => {
   return (
-    <div className="relative h-[200px]">
+    <div className="relative h-[125px] tablet:h-[200px]">
       <Image src={src} alt="profile banner" fill objectFit="cover" />
     </div>
   );

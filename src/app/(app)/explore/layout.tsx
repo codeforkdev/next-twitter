@@ -10,10 +10,10 @@ import { ArrowLeft } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Avatar } from "@/components/Avatar";
 import { MainLayout } from "../home/layout";
-import Slide from "../home/@components/Slide";
 import Link from "next/link";
 import { Users } from "./@components/Users";
 import { searchUsers } from "@/actions/users";
+import { ScrollInView } from "@/components/ScrollInView";
 
 type User = typeof users.$inferSelect;
 
@@ -70,7 +70,7 @@ function Header() {
 
   return (
     <>
-      <Slide height={-106} className="">
+      <ScrollInView top={-106} className="">
         <header
           className="flex h-[106px] flex-col justify-between border-b border-white/20 bg-black/60"
           style={{ backdropFilter: "blur(10px)" }}
@@ -94,7 +94,7 @@ function Header() {
 
           <Tabs />
         </header>
-      </Slide>
+      </ScrollInView>
 
       <Users show={searching} users={searchList} />
     </>
