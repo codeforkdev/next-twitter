@@ -8,6 +8,9 @@ import { Avatar } from "@/components/Avatar";
 import { ScrollInView } from "@/components/ScrollInView";
 import Tab from "./@components/Tab";
 import MobileSideNavToggle from "@/components/Navigation/MobileSideNavToggle";
+import getSession from "@/lib/session";
+import { redirect } from "next/navigation";
+import { users } from "@/drizzle/schema";
 
 export const MainLayout = ({
   main,
@@ -28,13 +31,19 @@ export const MainLayout = ({
   );
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await getSession();
+  if (!session) redirect("/");
   return (
     <MainLayout
       main={
         <>
-          <Header />
-          <PostForm />
+          <Header user={session.user} />
+          <PostForm user={session.user} />
           <NewPostsIndicator />
           {children}
         </>
@@ -52,7 +61,7 @@ function NewPostsIndicator() {
   );
 }
 
-function Header() {
+function Header({ user }: { user: typeof users.$inferSelect }) {
   return (
     <>
       <ScrollInView
@@ -70,7 +79,7 @@ function Header() {
             </h1>
 
             {/* Profile Avatar */}
-            <MobileSideNavToggle />
+            <MobileSideNavToggle user={user} />
 
             {/* Logo */}
             <div className="-ml-4 tablet:hidden">

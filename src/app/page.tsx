@@ -1,9 +1,19 @@
+import { login } from "@/actions/auth";
 import { Spacer } from "@/components/Spacer";
+import getSession from "@/lib/session";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import React from "react";
+import PickUser from "./PickUser";
+import { db } from "@/drizzle/db";
 
-export default function Page() {
+export default async function Page() {
+  const session = await getSession();
+  if (session) {
+    redirect("/home");
+  }
+  const users = await db.query.users.findMany();
   return (
     <div className="flex h-full flex-col justify-center">
       <div className="mx-auto flex w-full max-w-7xl flex-1 shrink-0 items-center justify-between">
@@ -28,9 +38,12 @@ export default function Page() {
                 <p>or</p>
                 <div className="h-[1px] flex-1 bg-white/30" />
               </div>
-              <button className="w-full rounded-full  bg-primary py-2 text-sm font-semibold text-white">
-                Create Account
-              </button>
+              <form>
+                <button className="w-full rounded-full  bg-primary py-2 text-sm font-semibold text-white">
+                  Create Account
+                </button>
+              </form>
+
               <p className="text-xs">
                 By signing up, you agree to the{" "}
                 <span className="text-primary">Terms of Service</span> and
@@ -41,12 +54,13 @@ export default function Page() {
             <Spacer className="my-16" />
             <div className="flex flex-col gap-4">
               <p className="text-lg font-semibold">Already have an account?</p>
-              <Link
+              <PickUser userList={users} />
+              {/* <Link
                 href="/home"
                 className="w-full rounded-full border border-white/20 py-2 text-center text-primary"
               >
                 Sign in
-              </Link>
+              </Link> */}
             </div>
           </div>
         </section>

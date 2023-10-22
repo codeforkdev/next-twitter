@@ -27,14 +27,15 @@ import {
 import { Spacer } from "../Spacer";
 import React, { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { logout } from "@/actions/auth";
+import { users } from "@/drizzle/schema";
+import { User } from "@/types";
 
-export default function MobileSideNavToggle() {
+export default function MobileSideNavToggle({ user }: { user: User }) {
   const handleClick = () => {
     console.log("clicked");
   };
   return (
-    // Remove flexl-1
-
     <>
       <Dialog.Root>
         <Dialog.Trigger asChild>
@@ -53,7 +54,7 @@ export default function MobileSideNavToggle() {
           </Dialog.Overlay>
 
           <Dialog.Content className="fixed left-0 top-0 z-[999] h-[100dvh] w-3/4 ">
-            <MobileSideNav />
+            <MobileSideNav user={user} />
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
@@ -61,7 +62,7 @@ export default function MobileSideNavToggle() {
   );
 }
 
-function MobileSideNav() {
+function MobileSideNav({ user }: { user: User }) {
   const [openTabs, setOpenTabs] = useState<string[]>([]);
   return (
     <motion.nav
@@ -202,13 +203,13 @@ function MobileSideNav() {
               </Link>
             </li>
             <li>
-              <Link
-                href="https://ads.twitter.com/"
+              <button
+                onClick={() => logout()}
                 className="flex items-center gap-4 px-4 text-sm"
               >
                 <LogOutIcon size={20} />
                 Log out
-              </Link>
+              </button>
             </li>
           </ul>
         </AccordionItem>

@@ -1,28 +1,26 @@
-"use client";
 import { Link } from "lucide-react";
-import Search from "../explore/@components/Search";
 import { MainLayout } from "../home/layout";
 
 function Aside() {
   return (
     <>
-      <div className="relative">
+      {/* <div className="relative">
         <Search onBlur={() => {}} onFocus={() => {}} onChange={() => {}} />
-      </div>
-      <div className="w-full bg-[#16181c] p-4 rounded-xl">
-        <p className="text-xl font-bold mb-2">Subscribe to Premium</p>
-        <p className="mb-3 font-semibold text-sm">
+      </div> */}
+      <div className="w-full rounded-xl bg-[#16181c] p-4">
+        <p className="mb-2 text-xl font-bold">Subscribe to Premium</p>
+        <p className="mb-3 text-sm font-semibold">
           Subscribe to unlock new features and if eligible, receive a share of
           ads revenue.
         </p>
-        <button className="bg-primary font-semibold py-1 px-4 rounded-full">
+        <button className="rounded-full bg-primary px-4 py-1 font-semibold">
           Subscribe
         </button>
       </div>
 
-      <div className="w-full bg-[#16181c] p-4 rounded-xl">
-        <p className="text-xl font-bold mb-2">What's happening</p>
-        <p className="mb-3 font-semibold text-sm">
+      <div className="w-full rounded-xl bg-[#16181c] p-4">
+        <p className="mb-2 text-xl font-bold">What's happening</p>
+        <p className="mb-3 text-sm font-semibold">
           Subscribe to unlock new features and if eligible, receive a share of
           ads revenue.
         </p>

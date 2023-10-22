@@ -13,13 +13,32 @@ export const id = varchar("id", { length: 21 }).primaryKey().notNull();
 
 export const createdAt = timestamp("created_at", { mode: "date" })
   .notNull()
-  .defaultNow();
+  .default(sql`CURRENT_TIMESTAMP`);
+
+export const sessions = mysqlTable("sessions", {
+  id,
+  userId: char("user_id", { length: 21 }).notNull(),
+  createdAt,
+  expireAt: timestamp("expire_at", { mode: "date" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
+    references: [users.id],
+  }),
+}));
+
 export const users = mysqlTable("users", {
   id,
   handle: varchar("handle", { length: 21 }).notNull(),
-  avatar: varchar("avatar", { length: 500 }),
+  avatar: varchar("avatar", { length: 500 }).notNull(),
   displayName: varchar("display_name", { length: 52 }).notNull(),
-  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { mode: "date" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -69,10 +88,6 @@ export const posts = mysqlTable("posts", {
   userId: char("user_id", { length: 21 }).notNull(),
   text: varchar("text", { length: 500 }).notNull(),
   createdAt,
-});
-
-export const postReplies = mysqlTable("post_replies", {
-  id,
 });
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -140,6 +155,7 @@ export const conversationParticipantsRelations = relations(
     messges: many(conversationMessages),
   }),
 );
+
 export const followings = mysqlTable("following", {
   id,
   followerId: varchar("follower_id", { length: 21 }).notNull(),

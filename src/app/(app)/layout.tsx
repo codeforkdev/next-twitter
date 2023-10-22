@@ -4,14 +4,30 @@ import Modal from "./@modal/(.)compose/post/page";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { eq } from "drizzle-orm";
+import { db } from "@/drizzle/db";
+import { sessions } from "@/drizzle/schema";
+import { removeSessionCookie } from "@/actions/auth";
+import getSession from "@/lib/session";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await getSession();
+  if (!session) {
+    redirect("/");
+  }
+
   return (
     <div>
       <Container>
-        <DesktopNavbar />
+        <DesktopNavbar user={session.user} />
         {children}
-        <LinkTree />
+        {/* <LinkTree /> */}
         <MobileNavbar />
       </Container>
     </div>

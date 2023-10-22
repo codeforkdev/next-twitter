@@ -12,7 +12,7 @@ type Post = typeof schema.posts.$inferInsert;
 async function seedUsers() {
   let users: User[] = [devUser];
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 2; i < 5; i++) {
     users.push({
       id: nanoid(),
       displayName: faker.person.fullName(),

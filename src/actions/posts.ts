@@ -42,12 +42,13 @@ export async function submitLike({
   userId: string;
   postId: string;
 }) {
+  console.log("submiting like");
   await db.insert(likes).values({ id: nanoid(), userId, postId });
   const postLikes = await db.query.likes.findMany({
     where: eq(likes.postId, postId),
   });
-  fetch(`http://localhost:1999/parties/post/${postId}`, {
-    method: "POST",
-    body: JSON.stringify({ likes: postLikes.length }),
-  });
+  // fetch(`http://localhost:1999/parties/post/${postId}`, {
+  //   method: "POST",
+  //   body: JSON.stringify({ likes: postLikes.length }),
+  // });
 }

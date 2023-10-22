@@ -25,7 +25,7 @@ export function ComposePostBtn({ dim }: { dim: boolean }) {
     <motion.button
       animate={dim ? "bright" : "dim"}
       variants={variant}
-      className="h-14 w-14 bg-primary flex justify-center items-center  rounded-full fixed bottom-[74px] right-5 tablet:hidden"
+      className="fixed bottom-[74px] right-5 flex h-14 w-14  items-center justify-center rounded-full bg-primary tablet:hidden"
       onClick={() => router.push("/compose/post")}
     >
       <Feather size={26} />
@@ -33,7 +33,7 @@ export function ComposePostBtn({ dim }: { dim: boolean }) {
   );
 }
 
-export function MobileNavbar(props: {}) {
+export function MobileNavbar() {
   const { scrollY } = useScroll();
   const [y, setY] = useState(scrollY.get());
   const [dim, setDim] = useState(y === 0 ? true : false);
@@ -59,7 +59,7 @@ export function MobileNavbar(props: {}) {
     <>
       <ComposePostBtn dim={dim} />
       <Wrapper dim={dim}>
-        <ul className="flex justify-evenly gap-8 items-center h-full max-w-[352px] mx-auto">
+        <ul className="mx-auto flex h-full max-w-[352px] items-center justify-evenly gap-8">
           <Link href="/home">
             <Icon Icon={Home} href="/home" />
           </Link>
@@ -96,7 +96,7 @@ export function Wrapper({
           opacity: 1,
         },
       }}
-      className="h-[53px] border-t border-t-slate-700 tablet:hidden fixed bottom-0 left-0 w-full bg-black"
+      className="fixed bottom-0 left-0 h-[53px] w-full border-t border-t-slate-700 bg-black tablet:hidden"
     >
       {children}
     </motion.nav>
@@ -107,7 +107,7 @@ const Icon = ({ Icon, href }: { Icon: LucideIcon; href: string }) => {
   const pathname = usePathname();
   const active = pathname === href;
   return (
-    <div className="relative group tablet:hover:bg-white/10 active:bg-white/10 desktop:hover:bg-white/0 h-12 w-12 flex items-center justify-center rounded-full desktop:hover:bg-none">
+    <div className="group relative flex h-12 w-12 items-center justify-center rounded-full active:bg-white/10 tablet:hover:bg-white/10 desktop:hover:bg-white/0 desktop:hover:bg-none">
       <Icon
         size={active ? 30 : 25}
         className={cn("-mt-0.5", {

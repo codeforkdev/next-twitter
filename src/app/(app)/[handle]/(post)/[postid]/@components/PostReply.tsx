@@ -24,6 +24,7 @@ export default function PostReply({
   const handleReply = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     submitReply({ userId: user.id, handle, text, postId });
+    setText("");
   };
   return (
     <div
@@ -42,6 +43,7 @@ export default function PostReply({
                 e.stopPropagation();
               }}
               onInput={(e) => setText(e.currentTarget.value)}
+              value={text}
               onFocus={() => {
                 console.log("focused");
                 setIsFocused(true);

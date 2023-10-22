@@ -3,4 +3,5 @@ export const user = {
   handle: "codeforkdev",
   avatar: "https://avatars.githubusercontent.com/u/142317935?v=4",
   displayName: "Codefork",
+  password: "JerseyNative",
 };

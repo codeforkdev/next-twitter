@@ -1,6 +1,5 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { user } from "@/mock/mock-data";
 import {
   Bell,
   Bookmark,
@@ -11,7 +10,7 @@ import {
   Mail,
   MoreHorizontal,
   Search,
-  User,
+  UserIcon,
   Users2,
 } from "lucide-react";
 import Image from "next/image";
@@ -19,8 +18,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { Avatar } from "../Avatar";
+import { users } from "@/drizzle/schema";
+import { User } from "@/types";
+import * as Popover from "@radix-ui/react-popover";
 
-export function DesktopNavbar() {
+export function DesktopNavbar({ user }: { user: typeof users.$inferSelect }) {
   let cls = "py-1 group w-full flex  justify-center desktop:justify-start";
   return (
     <Container>
@@ -88,7 +90,7 @@ export function DesktopNavbar() {
         </Link>
         <Link href={"/" + user.handle} className={cls}>
           <LinkContent>
-            <Icon Icon={User} href={"/" + user.handle} />
+            <Icon Icon={UserIcon} href={"/" + user.handle} />
             <Label href={"/" + user.handle}>Profile</Label>
           </LinkContent>
         </Link>
@@ -110,24 +112,54 @@ export function DesktopNavbar() {
           </span>
         </button>
 
-        <div className="mt-auto w-full ">
-          <button className="flex w-full justify-center rounded-full p-3 hover:bg-white/10 desktop:justify-start desktop:p-4 desktop:pl-0">
-            <div className="flex  items-center gap-2">
-              <Avatar src={user.avatar} className="h-12 w-12 shrink-0" />
-              <div className="hidden flex-col desktop:flex ">
-                <div className="font-bold">{user.displayName}</div>
-                <div className="text-sm text-white/50">@{user.handle}</div>
-              </div>
-              <div className="ml-auto hidden desktop:block">
-                <MoreHorizontal size={20} />
-              </div>
-            </div>
-          </button>
+        <div className="mt-auto pb-2 desktop:w-full desktop:pr-2">
+          <UserMore user={user} />
         </div>
       </ul>
     </Container>
   );
 }
+
+const UserMore = ({ user }: { user: User }) => {
+  return (
+    <Popover.Root>
+      <Popover.Trigger asChild>
+        <button className="flex w-full justify-center rounded-full p-3 hover:bg-white/10 desktop:justify-start">
+          <div className="flex  w-full items-center gap-5">
+            <Avatar src={user.avatar} className="h-10 w-10 shrink-0" />
+            <div className="hidden flex-col items-start desktop:flex ">
+              <div className="font-bold">{user.displayName}</div>
+              <div className="text-sm text-white/50">@{user.handle}</div>
+            </div>
+            <div className="ml-auto hidden desktop:block">
+              <MoreHorizontal size={20} />
+            </div>
+          </div>
+        </button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          className="w-72 rounded-xl bg-black py-4"
+          style={{
+            boxShadow: "0px 0px 18px -6px rgba(255,255,255,0.75)",
+          }}
+        >
+          <ul className="text-sm font-semibold">
+            <li>
+              <Link
+                href="/logout"
+                className="block px-6 py-4 text-left hover:bg-gray-500/10"
+              >
+                Logout of @{user.handle}
+              </Link>
+            </li>
+          </ul>
+          <Popover.Arrow className="fill-black" />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+};
 
 const Container = ({ children }: { children: React.ReactNode }) => {
   return (

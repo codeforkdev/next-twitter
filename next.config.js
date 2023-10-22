@@ -7,6 +7,7 @@ const nextConfig = {
   images: {
     remotePatterns: [{ protocol: "https", hostname: "**" }],
   },
+  skipMiddlewareUrlNormalize: true,
 };
 
 module.exports = nextConfig;

@@ -5,13 +5,17 @@ import { cn } from "@/lib/utils";
 import { user } from "@/mock/mock-data";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Check, MailPlusIcon, Plus, SearchIcon, Users, X } from "lucide-react";
-import { ChangeEvent, useRef, useState } from "react";
+import React, { ChangeEvent, useRef, useState } from "react";
 import { Avatar } from "@/components/Avatar";
 import { users } from "../../../../drizzle/schema";
 import { searchUsers } from "@/actions/users";
 
 type User = typeof users.$inferSelect;
-export default function NewConversationModal() {
+export default function NewConversationModal({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [open, setOpen] = useState(false);
 
   const [fetchedUsers, setFetchedUsers] = useState<User[]>([]);
@@ -44,9 +48,7 @@ export default function NewConversationModal() {
 
   return (
     <Dialog.Root onOpenChange={setOpen} open={open}>
-      <Dialog.Trigger>
-        <MailPlusIcon size={20} />
-      </Dialog.Trigger>
+      <Dialog.Trigger asChild>{children}</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-neutral-400/30" />
         <Dialog.Content className="fixed left-1/2 top-[50%] z-50 flex h-[660px] w-full max-w-[600px] -translate-x-1/2 -translate-y-1/2 flex-col rounded-xl bg-black">

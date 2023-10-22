@@ -1,16 +1,19 @@
-import React from "react";
 import { cn } from "@/lib/utils";
-import { SearchIcon, SettingsIcon } from "lucide-react";
+import { MailPlusIcon, SearchIcon, SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import ConversationsList from "./@components/ConversationsList";
 import { Spacer } from "@/components/Spacer";
 import NewConversationModal from "./@components/NewConversationModal";
+import getSession from "@/lib/session";
+import { redirect } from "next/navigation";
 
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getSession();
+  if (!session) redirect("/");
   return (
     <div className={cn("flex w-full")}>
       <div className="w-[390px] border-r border-white/20">
@@ -18,7 +21,7 @@ export default async function Layout({
         <Spacer className="my-2" />
         <Search />
         <Spacer className="my-2" />
-        <ConversationsList />
+        <ConversationsList userId={session.user.id} />
       </div>
 
       {/* <Conversations conversations={conversations} /> */}
@@ -47,7 +50,11 @@ const ConversationsHeader = () => {
     <div className="flex items-center gap-4 p-4 pt-3">
       <p className="text-white/200 mr-auto text-xl font-semibold">Messages</p>
       <SettingsButton />
-      <NewConversationModal />
+      <NewConversationModal>
+        <button>
+          <MailPlusIcon size={20} />
+        </button>
+      </NewConversationModal>
     </div>
   );
 };
