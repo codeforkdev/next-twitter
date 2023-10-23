@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import * as HoverCard from "@radix-ui/react-hover-card";
 import {
   BarChart2,
+  BookmarkIcon,
   Heart,
   MessageCircle,
   MoreHorizontal,
@@ -26,6 +27,7 @@ type PostProps = {
   author: typeof users.$inferSelect;
   isBookmarked: boolean;
   comments: number;
+  liked: boolean;
   likes: number;
 };
 
@@ -163,11 +165,18 @@ export default function Post({
             )}
             onClick={handleLike}
           >
-            <div className="rounded-full p-1.5 group-hover:bg-pink-500/20 group-hover:text-pink-600 ">
-              <Heart size={18} />
+            <div
+              className={cn(
+                "rounded-full p-1.5 group-hover:bg-pink-500/20 group-hover:text-pink-600 ",
+              )}
+            >
+              <Heart
+                size={18}
+                className={cn("fill-pink-500 stroke-pink-500", liked)}
+              />
             </div>
             <div className="relative flex h-6 w-fit items-center group-hover:text-pink-600">
-              <div className="">{likes}</div>
+              <div className="">{likes !== 0 && likes}</div>
             </div>
           </button>
 
@@ -191,7 +200,7 @@ export default function Post({
             onClick={handleLike}
           >
             <div className="rounded-full p-1.5 group-hover:bg-sky-500/20 group-hover:text-sky-600 ">
-              <Share size={18} />
+              <BookmarkIcon size={18} />
             </div>
             <div className="relative flex h-6 w-fit items-center group-hover:text-sky-600">
               <div className=""></div>

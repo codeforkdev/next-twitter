@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/drizzle/db";
-import { likes, posts } from "@/drizzle/schema";
+import { bookmarks, likes, posts } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
@@ -52,3 +52,15 @@ export async function submitLike({
   //   body: JSON.stringify({ likes: postLikes.length }),
   // });
 }
+
+export async function submiteBookmark({
+  userId,
+  postId,
+}: {
+  userId: string;
+  postId: string;
+}) {
+  await db.insert(bookmarks).values({ id: nanoid(), userId, postId });
+}
+
+export async function removeBookmark() {}

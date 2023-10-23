@@ -1,6 +1,6 @@
 import Post from "@/components/Post";
 import { db } from "@/drizzle/db";
-import { desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import { bookmarks, likes, posts, users } from "@/drizzle/schema";
 import getSession from "@/lib/session";
 import { redirect } from "next/navigation";
@@ -50,21 +50,39 @@ export default async function Home() {
     .groupBy(targetPosts.id)
     .as("comments");
 
+  const postLikes = db
+    .select({
+      postId: targetPosts.id,
+      count: sql<number>`count(${targetPosts.id})`.mapWith(Number).as("count"),
+    })
+    .from(targetPosts)
+    .leftJoin(likes, eq(targetPosts.id, likes.postId))
+    .groupBy(targetPosts.id)
+    .as("post_likes");
+
+  const liked = db
+    .select()
+    .from(likes)
+    .where(eq(likes.userId, session.user.id))
+    .as("liked");
+
   const data = await db
     .select({
       id: targetPosts.id,
       createdAt: targetPosts.createdAt,
       text: targetPosts.text,
-      likes: sql<number>`count(${likes.id})`.mapWith(Number),
+      likes: postLikes.count,
       comments: comments.count,
       author: users,
+      liked: liked.userId,
     })
     .from(targetPosts)
     .innerJoin(users, eq(targetPosts.userId, users.id))
     .leftJoin(comments, eq(targetPosts.id, comments.id))
-    .leftJoin(likes, eq(targetPosts.id, likes.postId))
+    .leftJoin(postLikes, eq(targetPosts.id, postLikes.postId))
+    .leftJoin(liked, eq(targetPosts.id, liked.postId))
     .groupBy(targetPosts.id);
-
+  console.log(data);
   return (
     <ol>
       {data.map((post) => {
@@ -78,6 +96,7 @@ export default async function Home() {
               text={post.text}
               comments={post.comments}
               id={post.id}
+              liked={post.liked ? true : false}
               likes={post.likes}
               isBookmarked={true}
             />
