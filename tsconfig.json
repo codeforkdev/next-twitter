@@ -27,7 +27,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/db/planetscale.js"
+    "src/app/db/planetscale.js"
   ],
   "exclude": ["node_modules"]
 }

@@ -1,14 +1,14 @@
-import { db } from "@/drizzle/db";
-import { sessions } from "@/drizzle/schema";
+import db from "@/server/db";
+import { sessions } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 export default async function getSession() {
   const sessionId = cookies().get("sessionId")?.value;
-  if (!sessionId) return;
+  if (!sessionId) return undefined;
+
   const session = await db.query.sessions.findFirst({
-    where: eq(sessions.id, sessionId),
+    where: eq(sessions.id, ""),
     columns: {
       id: true,
     },
