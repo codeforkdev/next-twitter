@@ -54,7 +54,9 @@ export async function submitReply({
   revalidatePath("/" + handle + "/" + postId);
 }
 
-export const likePost = async (userId: string, postId: string) => {};
+export const likePost = async (userId: string, postId: string) => {
+  await db.insert(likes).values({ id: nanoid(), userId, postId });
+};
 
 export const unlikePost = async (userId: string, postId: string) => {
   await db
@@ -62,27 +64,26 @@ export const unlikePost = async (userId: string, postId: string) => {
     .where(and(eq(likes.userId, userId), eq(likes.postId, postId)));
 };
 
-export async function toggleLikePost(userId: string, postId: string) {
-  const alreadyLiked = await db.query.likes.findFirst({
-    where: and(eq(likes.userId, userId), eq(likes.postId, postId)),
-  });
-
-  alreadyLiked ? unlikePost(userId, postId) : likePost(userId, postId);
-
-  const likesCount = await getLikesCount(postId);
+export async function toggleLikePost(
+  userId: string,
+  postId: string,
+  isLiked: boolean,
+) {
   try {
-    broadcast<{ type: "like"; data: number }>({
-      party: "posts",
-      roomId: postId,
-      data: {
-        type: "like",
-        data: likesCount,
-      },
-    });
-  } catch {
-    revalidatePath("/");
-  }
-  broadcastLikes(postId);
+    // const alreadyLiked = await db.query.likes.findFirst({
+    //   where: and(eq(likes.userId, userId), eq(likes.postId, postId)),
+    // });
+    // console.log(alreadyLiked);
+    if (isLiked) {
+      await unlikePost(userId, postId);
+      broadcastLikes(postId);
+      return false;
+    } else {
+      await likePost(userId, postId);
+      broadcastLikes(postId);
+      return true;
+    }
+  } catch {}
 }
 
 type BroadcastProps<T> = {
@@ -98,26 +99,28 @@ export const broadcast = <T>(params: BroadcastProps<T>) => {
 };
 
 const getLikesCount = async (postId: string) => {
-  const QueryResult = z.number();
+  const QueryResult = z.object({
+    likes: z.coerce.number(),
+  });
   type QueryResult = z.infer<typeof QueryResult>;
 
-  const [totalNumOfLikes] = (
-    await db.execute(
-      sql.raw(`SELECT COUNT(*) from likes WHERE posts.id === '${postId}'`),
-    )
-  ).rows;
-
-  return QueryResult.parse(totalNumOfLikes);
+  const response = await db.execute(
+    sql.raw(
+      `SELECT COUNT(*) as 'likes' FROM likes WHERE likes.post_id = '${postId}'`,
+    ),
+  );
+  return QueryResult.parse(response.rows[0]).likes;
 };
 
 export const broadcastLikes = async (postId: string) => {
   const likesCount = await getLikesCount(postId);
+  console.log("BROADCASTING LIKES", likesCount);
   try {
-    broadcast<{ type: "like"; data: number }>({
-      party: "posts",
+    broadcast<{ type: "likes"; data: number }>({
+      party: "post",
       roomId: postId,
       data: {
-        type: "like",
+        type: "likes",
         data: likesCount,
       },
     });
@@ -135,14 +138,17 @@ export async function submitBookmark({
   postId: string;
   isBookmarked: boolean;
 }) {
-  if (!isBookmarked) {
-    await db.insert(bookmarks).values({ id: nanoid(), userId, postId });
-  } else {
-    await db
-      .delete(bookmarks)
-      .where(and(eq(bookmarks.userId, userId), eq(bookmarks.postId, postId)));
-  }
-  revalidatePath("/bookmarks");
+  try {
+    if (!isBookmarked) {
+      await db.insert(bookmarks).values({ id: nanoid(), userId, postId });
+      return true;
+    } else {
+      await db
+        .delete(bookmarks)
+        .where(and(eq(bookmarks.userId, userId), eq(bookmarks.postId, postId)));
+      return false;
+    }
+  } catch {}
 }
 
 export async function removeBookmark() {}

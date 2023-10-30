@@ -1,8 +1,8 @@
 {
   "name": "next-twitter-party",
-  "main": "party/index.ts",
+  "main": "src/server/party/index.ts",
   "compatibilityDate": "2023-10-03",
   "parties": {
-    "post": "party/post.ts"
+    "post": "src/server/party/post.ts"
   }
 }

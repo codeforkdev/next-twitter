@@ -1,8 +1,5 @@
-import { MainLayout } from "@/app/(www)/(main)/home/layout";
 import { Avatar } from "@/app/_components/Avatar";
 import { Spacer } from "@/app/_components/Spacer";
-import { db } from "@/drizzle/db";
-import { bookmarks, likes, posts, users, views } from "@/drizzle/schema";
 import PostReply from "./@components/PostReply";
 import { desc, eq, isNull, sql } from "drizzle-orm";
 import {
@@ -14,30 +11,78 @@ import {
   Share,
 } from "lucide-react";
 import BackButton from "@/app/_components/BackButton";
-import Post from "@/app/_components/Post";
 import { redirect } from "next/navigation";
 import getSession from "@/lib/session";
-import { getPostAndComments } from "@/app/(www)/(sandbox)/sandbox/page";
 import { nanoid } from "nanoid";
+import db from "@/server/db";
+import { MainLayout } from "@/app/_layouts/MainLayout";
+import Post from "@/app/_components/Post/Root";
+import { views } from "@/server/db/schema";
+import { verifyJWT } from "@/lib/auth";
+import { postSchema, postUserSchema } from "../../../home/page";
 
 export default async function Page({ params }: { params: { postid: string } }) {
-  const session = await getSession();
-  if (!session) redirect("/");
-  const { post, comments } = await getPostAndComments({
-    userId: session.user.id,
-    postId: params.postid,
-  });
+  const {
+    payload: { user },
+  } = await verifyJWT();
 
-  // console.log("POST", post);
-  // console.log(comments);
+  const postResponse = await db.execute(
+    sql.raw(`
+SELECT 
+      posts.id, 
+      posts.parent_id as 'parentId',
+      posts.text,
+      posts.created_at as 'createdAt',
+      users.id as 'userId',
+      users.avatar,
+      users.display_name as 'displayName',
+      users.handle,
+      count(likes.post_id) as likes,
+      count(post_views.post_id) as views,
+      count(bu.post_id) as bookmarked
+    FROM posts JOIN users on posts.user_id = users.id
+    LEFT JOIN likes on posts.id = likes.post_id
+    LEFT JOIN post_views on posts.id = post_views.post_id 
+    LEFT JOIN (SELECT post_id FROM bookmarks WHERE bookmarks.user_id = ${user.id}) as bu on bu.post_id = posts.id
+    WHERE posts.id = '${params.postid}'
+    GROUP BY posts.id
+  `),
+  );
 
-  await db
-    .insert(views)
-    .values({ id: nanoid(), userId: session.user.id, postId: params.postid });
+  const post = postUserSchema.parse(postResponse.rows[0]);
+  console.log("POST >>>> ", post);
 
-  if (!post) {
-    return <div>Could not find post</div>;
-  }
+  // if (true) {
+  //   return <div className="text-white">Could not find post</div>;
+  // }
+
+  const commentsResponse = await db.execute(
+    sql.raw(`
+SELECT 
+      posts.id, 
+      posts.parent_id as 'parentId',
+      posts.text,
+      posts.created_at as 'createdAt',
+      users.id as 'userId',
+      users.avatar,
+      users.display_name as 'displayName',
+      users.handle,
+      count(likes.post_id) as likes,
+      count(post_views.post_id) as views,
+      count(bu.post_id) as bookmarked
+    FROM posts JOIN users on posts.user_id = users.id
+    LEFT JOIN likes on posts.id = likes.post_id
+    LEFT JOIN post_views on posts.id = post_views.post_id 
+    LEFT JOIN (SELECT post_id FROM bookmarks WHERE bookmarks.user_id = ${user.id}) as bu on bu.post_id = posts.id
+    WHERE parent_id = '${params.postid}'
+    GROUP BY posts.id
+    `),
+  );
+
+  const comments = postUserSchema.array().parse(commentsResponse.rows);
+
+  console.log("POST", post);
+  console.log(comments);
 
   return (
     <MainLayout
@@ -46,10 +91,10 @@ export default async function Page({ params }: { params: { postid: string } }) {
           <Header />
           <div className="p-4 pb-0">
             <div className="flex gap-4">
-              <Avatar src={post.author.avatar ?? ""} className="h-10 w-10" />
+              <Avatar src={post.avatar ?? ""} className="h-10 w-10" />
               <div>
-                <p className="font-semibold">{post.author.displayName}</p>
-                <p className="text-white/40">@{post.author.handle}</p>
+                <p className="font-semibold">{post.displayName}</p>
+                <p className="text-white/40">@{post.handle}</p>
               </div>
             </div>
             <Spacer className="my-2" />
@@ -97,7 +142,12 @@ export default async function Page({ params }: { params: { postid: string } }) {
             </div>
 
             <Spacer className="my-4" />
-            <PostReply postId={post.id} handle={post.author.handle} />
+            <PostReply
+              postId={post.id}
+              handle={user.handle}
+              userId={user.id}
+              avatar={user.avatar}
+            />
           </div>
           <ul>
             {comments.map((post) => {
@@ -107,12 +157,24 @@ export default async function Page({ params }: { params: { postid: string } }) {
                   className="border-b border-white/20 px-4 py-3 transition-colors hover:bg-gray-700/10"
                 >
                   <Post
-                    key={post.id}
-                    userId={session.user.id}
-                    {...post}
-                    views={0}
-                    liked={post.isLiked}
-                    bookmarked={post.isBookmarked}
+                    id={post.id}
+                    text={post.text}
+                    viewer={{
+                      bookmarked: post.bookmarked,
+                      liked: false,
+                    }}
+                    metrics={{
+                      likes: post.likes,
+                      comments: 0,
+                      views: post.views,
+                      reposts: 0,
+                    }}
+                    author={{
+                      id: post.userId,
+                      avatar: post.avatar,
+                      displayName: post.displayName,
+                      handle: post.handle,
+                    }}
                   />
                 </li>
               );

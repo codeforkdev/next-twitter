@@ -1,5 +1,4 @@
 import type * as Party from "partykit/server";
-import { Payload } from "../types/types";
 
 export default class PostServer implements Party.Server {
   constructor(readonly party: Party.Party) {}
@@ -14,8 +13,7 @@ export default class PostServer implements Party.Server {
   async onRequest(request: Party.Request) {
     if (request.method === "POST") {
       console.log("porque mariaaaaaaaaa");
-      const payload = await request.json<Payload>();
-
+      const payload = await request.json<any>();
       console.log(payload);
       this.party.broadcast(JSON.stringify(payload));
     }

@@ -2,16 +2,19 @@
 import { Avatar } from "@/app/_components/Avatar";
 import TextareaAutoSize from "../TextArea";
 import { Spacer } from "@/app/_components/Spacer";
-import { user } from "@/mock/mock-data";
 import { useRef, useState, MouseEvent } from "react";
 import { ImagePlus } from "lucide-react";
 import { CircularProgressbar } from "react-circular-progressbar";
-import { submitReply } from "@/actions/posts";
+import { submitReply } from "@/app/actions/posts";
 
 export default function PostReply({
   postId,
+  avatar,
   handle,
+  userId,
 }: {
+  userId: string;
+  avatar: string;
   postId: string;
   handle: string;
 }) {
@@ -23,7 +26,7 @@ export default function PostReply({
 
   const handleReply = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    submitReply({ userId: user.id, handle, text, postId });
+    submitReply({ userId, handle, text, postId });
     setText("");
   };
   return (
@@ -35,7 +38,7 @@ export default function PostReply({
       className="-mx-4 border-b border-white/20 px-4 pb-4"
     >
       <div className=" flex gap-4 ">
-        <Avatar src={user.avatar ?? ""} className="h-10 w-10 shrink-0" />
+        <Avatar src={avatar ?? ""} className="h-10 w-10 shrink-0" />
         <div className="flex flex-1 flex-col">
           <div className="flex flex-1">
             <TextareaAutoSize
