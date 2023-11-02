@@ -1,4 +1,4 @@
-import { UserSchemaNoPassword } from "@/app/db/stores/User";
+import { users } from "@/server/db/schema";
 import { ensureError } from "@/types";
 import { JWTPayload, JWTVerifyResult, jwtVerify } from "jose";
 import { cookies } from "next/headers";
@@ -22,7 +22,7 @@ export const verifyJWT = async () => {
       new TextEncoder().encode(process.env.JWT_SECRET as string),
     );
     return verified as JWTVerifyResult<
-      JWTPayload & { user: UserSchemaNoPassword }
+      JWTPayload & { user: Omit<typeof users.$inferSelect, "password"> }
     >;
   } catch (err) {
     const error = ensureError(err);

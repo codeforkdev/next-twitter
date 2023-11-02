@@ -26,9 +26,8 @@ import { usePathname } from "next/navigation";
 import React, { useContext } from "react";
 import { Avatar } from "../Avatar";
 import * as Popover from "@radix-ui/react-popover";
-import { UserSchemaNoPassword } from "@/app/db/stores/User";
 import { Spacer } from "../Spacer";
-import { UserContext } from "@/app/(www)/(main)/UserProvider";
+import { UserContext } from "@/app/(main)/UserProvider";
 
 const UserMore = () => {
   const user = useContext(UserContext);

@@ -1,6 +1,6 @@
 "use client";
-import { UserContext } from "@/app/(www)/(main)/UserProvider";
-import { submitBookmark, toggleLikePost } from "@/app/actions/posts";
+import { toggleBookmark, toggleLikePost } from "@/actions/posts";
+import { UserContext } from "@/app/(main)/UserProvider";
 import { cn } from "@/lib/utils";
 import {
   BarChart2,
@@ -9,16 +9,19 @@ import {
   MessageCircle,
   Repeat2,
 } from "lucide-react";
+import { revalidatePath } from "next/cache";
 import usePartySocket from "partysocket/react";
+import { setUncaughtExceptionCaptureCallback } from "process";
 
-import { useEffect, MouseEvent, useState, useContext, useRef } from "react";
-import { set, z } from "zod";
+import { MouseEvent, useState, useContext, useRef } from "react";
+import { z } from "zod";
 
 type Props = {
   metrics: {
     likes: number;
     comments: number;
     reposts: number;
+    views: number;
   };
   liked: boolean;
   bookmarked: boolean;
@@ -29,6 +32,7 @@ export function Reactions(props: Props) {
   const [likes, setLikes] = useState(props.metrics.likes);
   const [comments, setComments] = useState(props.metrics.comments);
   const [reposts, setReposts] = useState(props.metrics.reposts);
+  const [views, setViews] = useState(props.metrics.views);
 
   let party = usePartySocket({
     host: "http://localhost:1999",
@@ -39,6 +43,7 @@ export function Reactions(props: Props) {
         z.object({ type: z.literal("likes"), data: z.number() }),
         z.object({ type: z.literal("comments"), data: z.number() }),
         z.object({ type: z.literal("reposts"), data: z.number() }),
+        z.object({ type: z.literal("views"), data: z.number() }),
       ]);
       const response = Schema.parse(JSON.parse(evt.data));
       console.log(response);
@@ -51,6 +56,9 @@ export function Reactions(props: Props) {
           break;
         case "reposts":
           setReposts(response.data);
+          break;
+        case "views":
+          setViews(response.data);
           break;
       }
     },
@@ -74,7 +82,9 @@ export function Reactions(props: Props) {
         <div className="rounded-full p-1.5 group-hover:bg-sky-500/20 group-hover:text-sky-600 ">
           <BarChart2 size={18} />
         </div>
-        <div className="relative flex h-6 w-fit items-center group-hover:text-sky-600"></div>
+        <div className="relative flex h-6 w-fit items-center group-hover:text-sky-600">
+          {views}
+        </div>
       </div>
       <BookmarkButton
         userId={user.id}
@@ -91,15 +101,13 @@ export function BookmarkButton(props: {
   isBookmarked: boolean;
 }) {
   const [status, setStatus] = useState(props.isBookmarked);
-  const handleToggle = async (e: MouseEvent<HTMLButtonElement>) => {
-    const result = await submitBookmark({
-      userId: props.userId,
-      postId: props.postId,
+  const handleToggle = async () => {
+    const newStatus = await toggleBookmark({
+      ...props,
       isBookmarked: status,
     });
-    console.log(result);
-    if (result !== undefined) {
-      setStatus(result);
+    if (newStatus !== undefined) {
+      setStatus(newStatus);
     }
   };
   return (
@@ -123,14 +131,17 @@ export function LikeButton(props: {
   postId: string;
   userId: string;
 }) {
+  const [c, setC] = useState(props.count);
   const [status, setStatus] = useState(props.isLiked);
   const ref = useRef<HTMLButtonElement>(null);
+
   const handleLike = async (e: MouseEvent<HTMLButtonElement>) => {
     if (!ref.current) return;
     ref.current.disabled = true;
-    const result = await toggleLikePost(props.userId, props.postId, status);
+    const result = await toggleLikePost(props.userId, props.postId);
     if (result !== undefined) {
-      setStatus(result);
+      setStatus(result.liked);
+      setC(result.count);
     }
     ref.current.disabled = false;
   };
@@ -147,7 +158,7 @@ export function LikeButton(props: {
         />
       </div>
       <div className="relative flex h-6 w-fit items-center group-hover:text-pink-600">
-        <div>{props.count !== 0 && props.count}</div>
+        <div>{c !== 0 && c}</div>
       </div>
     </button>
   );

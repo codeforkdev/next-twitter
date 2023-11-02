@@ -1,13 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
-  experimental: {
-    serverActions: true,
-  },
+  // experimental: {
+  // serverActions: true,
+  // },
   images: {
     remotePatterns: [{ protocol: "https", hostname: "**" }],
   },
-  skipMiddlewareUrlNormalize: true,
+  // skipMiddlewareUrlNormalize: true,
 };
 
 module.exports = nextConfig;

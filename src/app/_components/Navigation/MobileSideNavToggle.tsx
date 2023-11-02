@@ -26,9 +26,8 @@ import {
 import { Spacer } from "../Spacer";
 import React, { useContext, useEffect, useState } from "react";
 import { User } from "@/types";
-import { logout } from "@/app/actions/auth";
-import { UserSchemaNoPassword } from "@/app/db/stores/User";
-import { UserContext } from "@/app/(www)/(main)/UserProvider";
+import { UserContext } from "@/app/(main)/UserProvider";
+import { logout } from "@/actions/auth";
 
 export default function MobileSideNavToggle() {
   const user = useContext(UserContext);

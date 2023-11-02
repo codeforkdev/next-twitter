@@ -1,5 +1,11 @@
 import { relations, sql } from "drizzle-orm";
-import { char, mysqlTable, timestamp, varchar } from "drizzle-orm/mysql-core";
+import {
+  boolean,
+  char,
+  mysqlTable,
+  timestamp,
+  varchar,
+} from "drizzle-orm/mysql-core";
 
 export const id = varchar("id", { length: 21 }).primaryKey().notNull();
 
@@ -98,6 +104,7 @@ export const viewsRelations = relations(views, ({ one }) => ({
 export const posts = mysqlTable("posts", {
   id,
   parentId: char("parent_id", { length: 21 }),
+  repost: boolean("repost").notNull().default(false),
   userId: char("user_id", { length: 21 }).notNull(),
   text: varchar("text", { length: 500 }).notNull(),
   createdAt,
