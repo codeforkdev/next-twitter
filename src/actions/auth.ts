@@ -18,9 +18,7 @@ export const login = async (params: { userId: string }) => {
       path: "/",
     });
     redirect("/home");
-  } catch (error) {
-    console.log("Fatal error: unable to login");
-  }
+  } catch (error) {}
 };
 
 export const logout = async () => {
@@ -28,9 +26,7 @@ export const logout = async () => {
   if (!sessionId) redirect("/");
   try {
     await db.delete(sessions).where(eq(sessions.id, sessionId));
-  } catch (e) {
-    console.log("unable to delete session");
-  }
+  } catch (e) {}
   cookies().delete("sessionId");
   revalidatePath("/");
 };

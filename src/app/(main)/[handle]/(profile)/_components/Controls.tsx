@@ -23,7 +23,6 @@ export const Controls = ({
   const size = 18;
 
   const handleFollowClick = () => {
-    console.log("clicked follow button");
     followAction(isFollowing, followerId, followingId);
   };
 
@@ -82,9 +81,7 @@ function FollowButton(props: ButtonProps & { isFollowing: boolean }) {
 }
 
 const MessageButton = ({ size }: { size: number }) => {
-  const handleClick = () => {
-    console.log("clicked message button");
-  };
+  const handleClick = () => {};
   return (
     <Button onClick={handleClick}>
       <MailIcon size={size} />
@@ -93,9 +90,7 @@ const MessageButton = ({ size }: { size: number }) => {
 };
 
 const MoreButton = ({ size }: { size: number }) => {
-  const handleClick = (e: ClickEvent) => {
-    console.log("clicked more button");
-  };
+  const handleClick = (e: ClickEvent) => {};
   return (
     <Button onClick={handleClick}>
       <MoreHorizontal size={size} />
@@ -104,9 +99,7 @@ const MoreButton = ({ size }: { size: number }) => {
 };
 
 const NotificationButton = ({ size }: { size: number }) => {
-  const handleClick = (e: ClickEvent) => {
-    console.log("clicked notification button");
-  };
+  const handleClick = (e: ClickEvent) => {};
   return (
     <Button onClick={handleClick}>
       <BellPlusIcon size={size} />

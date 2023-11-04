@@ -64,8 +64,6 @@ export default async function Page() {
       />
     );
   } catch (e) {
-    console.log(e);
-    console.log("ERROR");
     return <div>ERROR</div>;
   }
 }

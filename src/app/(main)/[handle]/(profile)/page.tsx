@@ -18,8 +18,6 @@ export default async function Page({ params }: { params: { handle: string } }) {
       WHERE users.handle = '${params.handle}'`),
   );
 
-  console.log(postIds);
-
   const posts = await getPosts({
     viewerId: user.id,
     postIds: idSchema.array().parse(postIds.rows),

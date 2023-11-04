@@ -81,7 +81,7 @@ const NavLink = (props: {
   const active = pathname.startsWith(props.url);
   return (
     <li className="group flex w-full justify-end ">
-      <Link href={props.url} className={cls}>
+      <a href={props.url} className={cls}>
         <div
           className={cn(
             "flex h-[50px] w-fit items-center gap-[10px] rounded-full bg-none pl-1 transition-colors desktop:pr-8 desktop:group-hover:bg-white/10",
@@ -96,7 +96,7 @@ const NavLink = (props: {
             {props.label}
           </span>
         </div>
-      </Link>
+      </a>
     </li>
   );
 };
@@ -118,7 +118,7 @@ const Logo = () => {
 
 export const DesktopNavbar = () => {
   return (
-    <nav className="sticky top-0 hidden h-[100dvh] w-[100px] border-r border-white/20 tablet:block desktop:w-[348px]">
+    <nav className="sticky top-0 hidden h-[100dvh] w-[100px] border-r border-white/20 tablet:block desktop:w-[320px]">
       <ul className="flex h-full w-full flex-col items-center pt-[.3px] tablet:items-center desktop:items-start">
         <NavLink label="" url="/home" icon={<Logo />} />
         <NavLink label="Home" url="/home" icon={<HomeIcon />} />

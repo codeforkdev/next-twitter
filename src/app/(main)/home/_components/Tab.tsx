@@ -16,12 +16,12 @@ export default function Tab({
   return (
     <Link
       href={href}
-      className="flex h-full flex-1 items-center justify-center "
+      className="flex h-full flex-1 items-center justify-center transition-colors hover:bg-white/10"
     >
       <div className="flex h-full flex-col justify-end ">
         <p
           className={cn(
-            "mb-3  flex text-center text-[15px] font-semibold tracking-wide text-gray-500",
+            "mb-2  flex text-center text-[15px] font-semibold tracking-wide text-gray-500",
             {
               "text-white": active,
             },

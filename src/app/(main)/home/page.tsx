@@ -12,9 +12,8 @@ export default async function Home() {
   } = await verifyJWT();
 
   try {
-    const query = sql`SELECT id FROM posts WHERE parent_id IS NULL`;
+    const query = sql`SELECT id FROM posts WHERE parent_id IS NULL ORDER BY created_at DESC`;
     const postIds = await db.execute(query);
-    console.log(postIds);
     const posts = await getPosts({
       viewerId: user.id,
       postIds: idSchema.array().parse(postIds.rows),

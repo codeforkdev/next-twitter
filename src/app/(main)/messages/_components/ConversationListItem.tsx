@@ -3,6 +3,7 @@ import { Avatar } from "@/app/_components/Avatar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import React from "react";
 
 type Props = {
   id: string;
@@ -14,13 +15,11 @@ export default function ConversationListItem({
   avatar,
   displayName,
 }: Props) {
-  const pathname = usePathname();
   return (
     <Link
       href={"/messages/" + id}
       className={cn(
         "flex  items-center gap-4 border-r border-transparent px-5 py-3  transition-colors duration-200 hover:bg-white/10",
-        { "border-primary bg-white/10": pathname.endsWith(id) },
       )}
     >
       <Avatar src={avatar} />
@@ -31,3 +30,22 @@ export default function ConversationListItem({
     </Link>
   );
 }
+
+export const Indicator = ({
+  conversationId,
+  children,
+}: {
+  conversationId: string;
+  children: React.ReactNode;
+}) => {
+  const pathname = usePathname();
+  return (
+    <div
+      className={cn(" w-full border-r border-transparent hover:bg-white/10", {
+        "border-primary bg-white/10": pathname.endsWith(conversationId),
+      })}
+    >
+      {children}{" "}
+    </div>
+  );
+};

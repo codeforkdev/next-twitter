@@ -135,7 +135,7 @@ export const conversationMessages = mysqlTable("conversation_messages", {
   participantId: varchar("conversation_participant_id", {
     length: 21,
   }).notNull(),
-  text: varchar("varchar", { length: 1000 }).notNull(),
+  text: varchar("text", { length: 1000 }).notNull(),
   createdAt,
 });
 

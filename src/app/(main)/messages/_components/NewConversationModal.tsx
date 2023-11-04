@@ -43,7 +43,7 @@ export default function NewConversationModal({
   const handleCreateConversation = () => {
     if (participants.length === 0) return;
     const userIds = participants.map((p) => p.id);
-    createConversation(userId, userIds);
+    createConversation([...userIds, userId]);
     setOpen(false);
   };
 

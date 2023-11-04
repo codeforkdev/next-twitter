@@ -16,11 +16,10 @@ export const postSchema = z.object({
   bookmarked: z.coerce.number().transform((val) => (val === 0 ? false : true)),
   liked: z.coerce.number().transform((val) => (val === 0 ? false : true)),
 });
+export type TPostSchema = z.infer<typeof postSchema>;
 
 export const idSchema = z
   .object({
     id: z.string(),
   })
   .transform((val) => val.id);
-
-export type TPostSchema = z.infer<typeof postSchema>;

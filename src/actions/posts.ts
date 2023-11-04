@@ -28,11 +28,9 @@ export async function submitPost({
 export async function submitReply({
   userId,
   text,
-  handle,
   postId,
 }: {
   userId: string;
-  handle: string;
   text: string;
   postId: string;
 }) {
@@ -47,11 +45,10 @@ export async function submitReply({
   fetch(`http://localhost:1999/parties/post/${postId}`, {
     method: "POST",
     body: JSON.stringify({
-      type: "comment",
+      type: "comments",
       data: { comments: postComments.length },
     }),
   });
-  revalidatePath("/" + handle + "/" + postId);
 }
 
 export const likePost = async (userId: string, postId: string) => {
@@ -76,25 +73,25 @@ export async function toggleLikePost(userId: string, postId: string) {
       await likePost(userId, postId);
     }
 
-    const likesCount = await getLikesCount(postId);
+    const count = await getLikesCount(postId);
 
     try {
-      broadcast<{ type: "likes"; data: number }>({
+      broadcast<{
+        type: "likes";
+        data: { userId: string; count: number; isLiked: boolean };
+      }>({
         party: "post",
         roomId: postId,
         data: {
           type: "likes",
-          data: likesCount,
+          data: {
+            userId,
+            count,
+            isLiked: alreadyLiked ? false : true,
+          },
         },
       });
     } catch {}
-
-    revalidatePath("/bookmarks");
-    if (alreadyLiked) {
-      return { liked: false, count: likesCount };
-    } else {
-      return { liked: true, count: likesCount };
-    }
   } catch {}
 }
 
@@ -124,33 +121,17 @@ const getLikesCount = async (postId: string) => {
   return QueryResult.parse(response.rows[0]).likes;
 };
 
-export const broadcastLikes = async (postId: string) => {
-  const likesCount = await getLikesCount(postId);
-  console.log("BROADCASTING LIKES", likesCount);
-  try {
-    broadcast<{ type: "likes"; data: number }>({
-      party: "post",
-      roomId: postId,
-      data: {
-        type: "likes",
-        data: likesCount,
-      },
-    });
-  } catch {
-    // revalidatePath("/");
-  }
-};
-
 export async function toggleBookmark({
   userId,
   postId,
-  isBookmarked,
 }: {
   userId: string;
   postId: string;
-  isBookmarked: boolean;
 }) {
   try {
+    const isBookmarked = await db.query.bookmarks.findFirst({
+      where: and(eq(bookmarks.userId, userId), eq(bookmarks.postId, postId)),
+    });
     if (!isBookmarked) {
       await db.insert(bookmarks).values({ id: nanoid(), userId, postId });
     } else {
@@ -158,14 +139,7 @@ export async function toggleBookmark({
         .delete(bookmarks)
         .where(and(eq(bookmarks.userId, userId), eq(bookmarks.postId, postId)));
     }
-
-    revalidatePath("/bookmarks", "page");
-
-    if (!isBookmarked) {
-      return true;
-    } else {
-      return false;
-    }
+    return isBookmarked ? false : true;
   } catch {}
 }
 

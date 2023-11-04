@@ -7,7 +7,6 @@ const config = {
   password: process.env.DATABASE_PASSWORD,
 } satisfies Config;
 
-console.log("connecting to planetscale");
 const connection = connect(config);
 
 export default drizzle(connection, { schema });

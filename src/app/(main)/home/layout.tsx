@@ -6,6 +6,9 @@ import { ScrollInView } from "@/app/_components/ScrollInView";
 import Tab from "./_components/Tab";
 import MobileSideNavToggle from "@/app/_components/Navigation/MobileSideNavToggle";
 import { MainLayout } from "@/app/_layouts/MainLayout";
+import SearchUsers from "./SearchUsers";
+import { Spacer } from "@/app/_components/Spacer";
+import { SettingsIcon } from "lucide-react";
 
 export default async function Layout({
   children,
@@ -43,16 +46,17 @@ function Header() {
         className="sticky z-10  flex w-full shrink-0 flex-col justify-between"
       >
         <header
-          className="flex h-[106px] flex-col justify-between border-b border-white/20"
+          className="flex flex-col justify-between border-b border-white/20"
           style={{ backdropFilter: "blur(10px)" }}
         >
-          <section className="flex items-center pl-4 pt-[10px] text-xl">
+          <section className="flex items-center pl-4 pt-3 text-xl tablet:pt-0">
             {/* Desktop title */}
-            <h1 className="hidden text-xl font-semibold text-gray-100 tablet:block">
+            <h1 className="mobile:block hidden text-xl font-semibold text-gray-100 desktop:hidden">
               Home
             </h1>
 
             {/* Profile Avatar */}
+
             <MobileSideNavToggle />
 
             {/* Logo */}
@@ -65,11 +69,15 @@ function Header() {
             {/* Buffer to center logo */}
             <div className="flex-1" />
           </section>
-
           {/* Tabs */}
-          <section className="flex">
+          <section className="flex h-[3.3rem] items-center">
             <Tab href="/home">For you</Tab>
             <Tab href="/home/following">Following</Tab>
+            <div className="px-4">
+              <button className=" rounded-full p-2 transition-colors hover:bg-white/10">
+                <SettingsIcon size={20} />
+              </button>
+            </div>
           </section>
         </header>
       </ScrollInView>
@@ -80,29 +88,31 @@ function Header() {
 export function Aside() {
   return (
     <>
-      <div className="relative">
-        {/* <Search onBlur={() => {}} onFocus={() => {}} onChange={() => {}} /> */}
-      </div>
-      <div className="w-full rounded-xl bg-[#16181c] p-4">
-        <p className="mb-2 text-xl font-bold">Subscribe to Premium</p>
-        <p className="mb-3 text-sm font-semibold">
-          Subscribe to unlock new features and if eligible, receive a share of
-          ads revenue.
-        </p>
-        <button className="rounded-full bg-primary px-4 py-1 font-semibold">
-          Subscribe
-        </button>
-      </div>
+      <Spacer className="pt-1" />
 
-      <div className="w-full rounded-xl bg-[#16181c] p-4">
-        <p className="mb-2 text-xl font-bold">What's happening</p>
-        <p className="mb-3 text-sm font-semibold">
-          Subscribe to unlock new features and if eligible, receive a share of
-          ads revenue.
-        </p>
-        <Link href="/explore" className="text-primary">
-          show more
-        </Link>
+      <div className="flex flex-col gap-4">
+        <SearchUsers />
+        <div className="w-full rounded-xl bg-[#16181c] p-4">
+          <p className="mb-2 text-xl font-bold">Subscribe to Premium</p>
+          <p className="mb-3 text-sm font-semibold">
+            Subscribe to unlock new features and if eligible, receive a share of
+            ads revenue.
+          </p>
+          <button className="rounded-full bg-primary px-4 py-1 font-semibold">
+            Subscribe
+          </button>
+        </div>
+
+        <div className="w-full rounded-xl bg-[#16181c] p-4">
+          <p className="mb-2 text-xl font-bold">What's happening</p>
+          <p className="mb-3 text-sm font-semibold">
+            Subscribe to unlock new features and if eligible, receive a share of
+            ads revenue.
+          </p>
+          <Link href="/explore" className="text-primary">
+            show more
+          </Link>
+        </div>
       </div>
     </>
   );

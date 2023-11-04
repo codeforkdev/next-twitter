@@ -1,7 +1,7 @@
 "use client";
-import { UserSchemaNoPassword } from "@/app/db/stores/User";
+import { users } from "@/server/db/schema";
 import React, { createContext } from "react";
-
+type UserSchemaNoPassword = Omit<typeof users.$inferSelect, "password">;
 export const UserContext = createContext<UserSchemaNoPassword>(
   {} as UserSchemaNoPassword,
 );

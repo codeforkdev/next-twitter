@@ -1,33 +1,26 @@
-import Post from "@/app/_components/Post";
-import { bookmarks, users } from "../../../../../server/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import db from "@/server/db";
+import { verifyJWT } from "@/lib/auth";
+import { getPosts } from "@/server/db/queries";
+import { idSchema } from "@/schemas";
+import PostsList from "@/app/_components/Post/PostsList";
+import { ensureError } from "@/types";
 export default async function Page() {
-  const posts = await db.query.posts.findMany({
-    columns: {
-      id: true,
-      text: true,
-    },
-    with: {
-      author: true,
-      bookmarks: {
-        where: eq(bookmarks.userId, "1"),
-      },
-      likes: {
-        columns: {
-          userId: true,
-        },
-      },
-    },
-  });
+  const {
+    payload: { user },
+  } = await verifyJWT();
 
-  return (
-    <ol className="flex flex-col">
-      {/* {posts?.map((post) => (
-        <li className="border-b border-white/20 px-4 py-3 ">
-          <Post {...post} isBookmarked={post.bookmarks.length !== 0} />
-        </li>
-      ))} */}
-    </ol>
-  );
+  try {
+    const query = sql`SELECT id FROM posts WHERE parent_id IS NULL`;
+    const postIds = await db.execute(query);
+    const posts = await getPosts({
+      viewerId: user.id,
+      postIds: idSchema.array().parse(postIds.rows),
+    });
+
+    return <PostsList posts={posts} />;
+  } catch (err) {
+    const error = ensureError(err);
+    throw new Error(error.message);
+  }
 }

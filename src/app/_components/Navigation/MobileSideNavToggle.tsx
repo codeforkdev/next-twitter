@@ -25,20 +25,17 @@ import {
 } from "lucide-react";
 import { Spacer } from "../Spacer";
 import React, { useContext, useEffect, useState } from "react";
-import { User } from "@/types";
 import { UserContext } from "@/app/(main)/UserProvider";
 import { logout } from "@/actions/auth";
+import { users } from "@/server/db/schema";
 
 export default function MobileSideNavToggle() {
   const user = useContext(UserContext);
-  const handleClick = () => {
-    console.log("clicked");
-  };
   return (
     <>
       <Dialog.Root>
         <Dialog.Trigger asChild>
-          <button className="flex-1  tablet:hidden" onClick={handleClick}>
+          <button className="flex-1  tablet:hidden">
             <Avatar src={user.avatar} />
           </button>
         </Dialog.Trigger>
@@ -61,7 +58,11 @@ export default function MobileSideNavToggle() {
   );
 }
 
-function MobileSideNav({ user }: { user: UserSchemaNoPassword }) {
+function MobileSideNav({
+  user,
+}: {
+  user: Omit<typeof users.$inferSelect, "password">;
+}) {
   const [openTabs, setOpenTabs] = useState<string[]>([]);
   return (
     <motion.nav
@@ -230,9 +231,7 @@ function AccordionItem({
   children: React.ReactNode[] | React.ReactNode;
 }) {
   const isOpen = openTabs.find((tab) => tab === value) ? true : false;
-  useEffect(() => {
-    console.log(openTabs);
-  }, [openTabs]);
+
   return (
     <Accordion.Item value={value}>
       <Accordion.Trigger className="flex w-full justify-between px-4 py-3">

@@ -13,22 +13,6 @@ export default function ChatInput({
   participantId,
 }: ChatInputProps) {
   const [value, setValue] = useState("");
-  const [messages, setMessages] = useState<{ id: string; text: string }[]>([]);
-  const ws = usePartySocket({
-    room: conversationId,
-    host: "http://localhost:1999",
-  });
-  useEffect(() => {
-    ws.addEventListener("message", (evt: MessageEvent) => {
-      const data = JSON.parse(evt.data);
-
-      console.log("Incoming data");
-      console.log(data);
-      setMessages((prev) => [...prev, JSON.parse(evt.data)]);
-    });
-    return () => ws.close();
-  }, []);
-
   const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.currentTarget.value);
   };
@@ -48,7 +32,7 @@ export default function ChatInput({
           <input
             className="flex-1 bg-transparent p-2 text-white outline-none"
             placeholder="Start a new message"
-            onChange={handleInput}
+            onInput={handleInput}
             value={value}
           />
           <button

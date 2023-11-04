@@ -26,7 +26,6 @@ export function PostForm() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = async () => {
-    console.log("clicked");
     await submitPost({ userId: user.id, text });
   };
 
@@ -64,7 +63,7 @@ export function PostForm() {
 
         <Spacer className="my-4" />
         <TextareaAutoSize
-          className="w-full resize-none bg-transparent text-xl outline-none placeholder:text-gray-400/70"
+          className="min-h-[45px] w-full resize-none bg-transparent text-xl outline-none placeholder:text-gray-400/70"
           placeholder="What is happenings?!"
           ref={inputRef}
           onInput={(e) => setText(e.currentTarget.value)}

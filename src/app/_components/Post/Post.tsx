@@ -2,8 +2,17 @@ import { Avatar } from "../Avatar";
 import LinkNoPropagation from "./LinkStopProp";
 import ProfileHoverCard from "./ProfileHoverCard";
 import { MoreHorizontalIcon } from "lucide-react";
-import { Reactions } from "./Reactions";
+import {
+  BookmarkButton,
+  CommentsButton,
+  LikeButton,
+  Reactions,
+  ReactionsProvider,
+  RepostButton,
+  ViewsButton,
+} from "./Reactions";
 import PostLink from "./PostLink";
+import StopPropagation from "../StopPropagation";
 
 type Props = {
   id: string;
@@ -59,7 +68,7 @@ export function PostHeader(props: {
   );
 }
 export default function Post(props: Props) {
-  const { id, text, author } = props;
+  const { metrics, viewer, author, id, text } = props;
 
   return (
     <PostLink handle={author.handle} id={id}>
@@ -75,12 +84,20 @@ export default function Post(props: Props) {
           <div className="max-w-full grow-0 break-words py-2 text-gray-200">
             {text}
           </div>
-          <Reactions
+          <ReactionsProvider
             postId={id}
-            metrics={props.metrics}
-            bookmarked={props.viewer.bookmarked}
-            liked={props.viewer.liked}
-          />
+            liked={viewer.liked}
+            bookmarked={viewer.bookmarked}
+            metrics={metrics}
+          >
+            <StopPropagation className="flex w-full cursor-default justify-between gap-4 text-gray-500">
+              <CommentsButton author={author} text={text} />
+              <RepostButton />
+              <LikeButton />
+              <ViewsButton />
+              <BookmarkButton />
+            </StopPropagation>
+          </ReactionsProvider>
         </section>
       </div>
     </PostLink>

@@ -65,9 +65,7 @@ export const followAction = async (
   followerId: string,
   followingId: string,
 ) => {
-  console.log("Follow user");
   if (isFollowing) {
-    console.log("unfollowing");
     await db
       .delete(followings)
       .where(
@@ -77,7 +75,6 @@ export const followAction = async (
         ),
       );
   } else {
-    console.log("following");
     await db
       .insert(followings)
       .values({ id: nanoid(), followerId, followingId });

@@ -16,10 +16,6 @@ export default function Chat() {
   const ws = usePartySocket({ room: "1", host: "http://localhost:1999" });
   useEffect(() => {
     ws.addEventListener("message", (evt: MessageEvent) => {
-      const data = JSON.parse(evt.data);
-
-      console.log("Incoming data");
-      console.log(data);
       setMessages((prev) => [...prev, JSON.parse(evt.data)]);
     });
   }, []);
@@ -29,7 +25,6 @@ export default function Chat() {
   };
 
   const handleSendMessage = () => {
-    console.log("send message");
     ws.send(JSON.stringify({ id: nanoid(), text: value }));
     // createMessage({
     //   conversationId,
@@ -38,7 +33,7 @@ export default function Chat() {
     // });
   };
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <div className="flex h-full flex-col overflow-hidden">
       <div className="flex-1 overflow-y-auto text-black">
         {messages.map((msg) => (
           <li key={msg.id}>{msg.text}</li>
