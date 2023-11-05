@@ -122,6 +122,7 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
 
 export const conversations = mysqlTable("conversation", {
   id,
+  createdAt,
 });
 
 export const conversationRelations = relations(conversations, ({ many }) => ({

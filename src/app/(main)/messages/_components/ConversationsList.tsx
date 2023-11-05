@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Avatar } from "@/app/_components/Avatar";
 import { idSchema } from "@/schemas";
 import { z } from "zod";
-import { Users2 } from "lucide-react";
+import { MoreHorizontal, Users2 } from "lucide-react";
 
 const getConversations = async (userId: string) => {
   const things = await db.query.conversationParticipants.findMany({
@@ -62,6 +62,8 @@ export default async function ConversationsList({
     // participantId: z.string(),
     latestMessage: z.string().nullable(),
     createdAt: z.coerce.date(),
+    messageCreatedAt: z.coerce.date(),
+    handle: z.string(),
     displayName: z.string(),
     avatar: z.string(),
   });
@@ -71,15 +73,16 @@ export default async function ConversationsList({
 
     for (let i = 0; i < conversationIds.length; i++) {
       query.append(sql`
-      SELECT conversationId, text as latestMessage, displayName, avatar, createdAt
+      SELECT conversationId, text as latestMessage, displayName, avatar, createdAt, handle, messageCreatedAt
       FROM (
-        SELECT p.id as participantId, conversation_id as conversationId, display_name as displayName, avatar
+        SELECT p.id as participantId, conversation_id as conversationId, display_name as displayName, avatar, handle, c.created_at as createdAt
         FROM conversation_participants as p
         JOIN users as u on p.user_id = u.id
+        JOIN conversation as c on p.conversation_id = c.id
         WHERE conversation_id = ${conversationIds[i]} AND user_id != ${userId}
       ) as thing
       LEFT JOIN (
-        SELECT conversation_id, text, created_at as createdAt
+        SELECT conversation_id, text, created_at as messageCreatedAt
         FROM conversation_messages as m
         WHERE conversation_id = ${conversationIds[i]}
         ORDER BY created_at DESC
@@ -87,19 +90,7 @@ export default async function ConversationsList({
       ) as latestMsg on thing.conversationId = latestMsg.conversation_id
 
       `);
-      // query.append(
-      //   sql`
-      //     SELECT *
-      //     FROM (
-      //       SELECT m.conversation_id as conversationId, m.id as messageId, m.text, m.created_at as createdAt, p.id as participantId, u.id as userId, avatar, handle, display_name as displayName
-      //       FROM conversation AS c
-      //       LEFT JOIN conversation_messages AS m on c.id = m.conversation_id
-      //       JOIN conversation_participants AS p ON m.conversation_participant_id = p.id
-      //       JOIN users AS u ON p.user_id = u.id
-      //       WHERE m.conversation_id = ${conversationIds[i]} ORDER BY m.created_at DESC LIMIT 1
-      //     ) as a
-      // `,
-      // );
+
       if (i !== conversationIds.length - 1) {
         query.append(sql`UNION`);
       }
@@ -115,23 +106,34 @@ export default async function ConversationsList({
           string,
           {
             id: string;
-            participants: { displayName: string; avatar: string }[];
-            latestMsg: { text: string; createdAt: Date } | null;
+            createdAt: Date;
+            participants: {
+              handle: string;
+              displayName: string;
+              avatar: string;
+            }[];
+            latestMessage: { text: string; createdAt: Date } | null;
           }
         >,
         currentValue,
       ) => {
-        const { conversationId, latestMessage, createdAt, ...participant } =
-          currentValue;
+        const {
+          conversationId,
+          latestMessage,
+          createdAt,
+          messageCreatedAt,
+          ...participant
+        } = currentValue;
 
         if (acc.has(conversationId)) {
           acc.get(conversationId)!.participants.push(participant);
         } else {
           acc.set(conversationId, {
             id: conversationId,
+            createdAt,
             participants: [participant],
-            latestMsg: latestMessage
-              ? { text: latestMessage, createdAt }
+            latestMessage: latestMessage
+              ? { text: latestMessage, createdAt: messageCreatedAt }
               : null,
           });
         }
@@ -147,32 +149,13 @@ export default async function ConversationsList({
       <ol className="flex flex-col gap-[2px]">
         {[...result.values()].map((tile) => {
           return (
-            <li className="flex">
-              <Indicator conversationId={tile.id}>
-                <Link
-                  href={"/messages/" + tile.id}
-                  className="flex flex-1 items-start gap-4 p-2"
-                >
-                  {tile.participants.length > 1 ? (
-                    <div className="flex h-10 w-10 items-center justify-center gap-1 rounded-full bg-primary">
-                      {tile.participants.length}
-                      <Users2 size={16} />
-                    </div>
-                  ) : (
-                    <Avatar
-                      src={tile.participants[0].avatar}
-                      className="h-10 w-10"
-                    />
-                  )}
-                  <div className="flex flex-col">
-                    <div>
-                      {tile.participants.map((p) => p.displayName)}{" "}
-                      {tile.latestMsg?.createdAt.toDateString()}
-                    </div>
-                    <p>{tile.latestMsg?.text}</p>
-                  </div>
-                </Link>
-              </Indicator>
+            <li>
+              <ConversationListItem
+                id={tile.id}
+                latestMessage={tile.latestMessage}
+                participants={tile.participants}
+                createdAt={tile.createdAt}
+              />
             </li>
           );
         })}
