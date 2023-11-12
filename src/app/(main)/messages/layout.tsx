@@ -1,10 +1,10 @@
-import { cn } from "@/lib/utils";
 import { MailPlusIcon, SearchIcon, SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import ConversationsList from "./_components/ConversationsList";
 import { Spacer } from "@/app/_components/Spacer";
 import NewConversationModal from "./_components/NewConversationModal";
 import { verifyJWT } from "@/lib/auth";
+import ConversationPageDynamicLayout from "./_components/ConversationListContainer";
 
 export default async function Layout({
   children,
@@ -16,18 +16,18 @@ export default async function Layout({
   } = await verifyJWT();
 
   return (
-    <div className={cn("flex w-full")}>
-      <div className="w-[390px] border-r border-white/20">
-        <ConversationsHeader userId={user.id} />
-        <Spacer className="my-2" />
-        <Search />
-        <Spacer className="my-2" />
-        <ConversationsList userId={user.id} />
-      </div>
-
-      {/* <Conversations conversations={conversations} /> */}
-      <div className="flex-1 border-r border-r-white/20">{children}</div>
-    </div>
+    <ConversationPageDynamicLayout
+      list={
+        <>
+          <ConversationsHeader userId={user.id} />
+          <Spacer className="my-2" />
+          <Search />
+          <Spacer className="my-2" />
+          <ConversationsList userId={user.id} />
+        </>
+      }
+      conversation={children}
+    />
   );
 }
 

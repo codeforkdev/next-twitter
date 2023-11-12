@@ -27,9 +27,6 @@ export default function NewMessages({
     },
   });
 
-  // useEffect(() => {
-  //   setMessages([]);
-  // }, [conversationId]);
   return (
     <>
       {messages.map((msg) => (

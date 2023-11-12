@@ -3,6 +3,7 @@
   "main": "src/server/party/index.ts",
   "compatibilityDate": "2023-10-03",
   "parties": {
-    "post": "src/server/party/post.ts"
+    "post": "src/server/party/post.ts",
+    "chat": "src/server/party/chat.ts"
   }
 }

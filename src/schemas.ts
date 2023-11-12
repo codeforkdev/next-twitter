@@ -23,3 +23,15 @@ export const idSchema = z
     id: z.string(),
   })
   .transform((val) => val.id);
+
+export const messageSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  text: z.string(),
+  createdAt: z.coerce.date(),
+  handle: z.string(),
+  avatar: z.string(),
+  displayName: z.string(),
+});
+
+export type TMessage = z.infer<typeof messageSchema>;

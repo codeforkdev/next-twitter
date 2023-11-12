@@ -1,12 +1,13 @@
 "use server";
 
+import { messageSchema } from "@/schemas";
 import db from "@/server/db";
 import {
   conversationMessages,
   conversationParticipants,
   conversations,
 } from "@/server/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -88,17 +89,21 @@ export const createMessage = async (params: CreateMessageProps) => {
   await db
     .insert(conversationMessages)
     .values({ id, conversationId, participantId, text });
-  const newMessage = await db.query.conversationMessages.findFirst({
-    where: eq(conversationMessages.id, id),
-    with: {
-      participant: true,
-    },
-  });
 
-  if (!newMessage) return;
+  const messagesResponse = await db.execute(sql`
+    SELECT m.id, text, m.created_at as createdAt, u.id as userId, handle, avatar, display_name as displayName 
+    FROM conversation_messages AS m
+    LEFT JOIN conversation_participants AS p ON p.id = m.conversation_participant_id
+    LEFT JOIN users AS u ON p.user_id = u.id
+    WHERE m.id = ${id}
+    `);
+
+  const message = messageSchema.parse(messagesResponse.rows[0]);
+
+  if (!message) return;
 
   fetch(`http://localhost:1999/parties/main/${conversationId}`, {
     method: "POST",
-    body: JSON.stringify(newMessage),
+    body: JSON.stringify(message),
   });
 };

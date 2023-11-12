@@ -1,98 +1,135 @@
-import { and, eq } from "drizzle-orm";
-import ChatInput from "./ChatInput";
-import NewMessages from "./NewMessages";
+import { sql } from "drizzle-orm";
 import Link from "next/link";
-import { InfoIcon } from "lucide-react";
-import { Avatar } from "@/app/_components/Avatar";
+import { ArrowLeftIcon, InfoIcon, MoveLeftIcon } from "lucide-react";
 import React from "react";
-import { cn } from "@/lib/utils";
 import db from "@/server/db";
-import {
-  conversationMessages,
-  conversationParticipants,
-} from "@/server/db/schema";
+
 import { verifyJWT } from "@/lib/auth";
-import { Message } from "./Message";
+import { z } from "zod";
+import ChatInput from "./ChatInput";
+import Conversation from "./Conversation";
+import { messageSchema } from "@/schemas";
+import { Avatar } from "@/app/_components/Avatar";
+import { AvatarGrid } from "@/app/_components/AvatarGrid";
+
+const participantSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  handle: z.string(),
+  avatar: z.string(),
+  displayName: z.string(),
+  joinedAt: z.coerce.date(),
+});
+
+type TParticipant = z.infer<typeof participantSchema>;
 
 export default async function Page({ params }: { params: { id: string } }) {
   const {
     payload: { user },
   } = await verifyJWT();
-  const participant = await db.query.conversationParticipants.findFirst({
-    where: and(
-      eq(conversationParticipants.userId, user.id),
-      eq(conversationParticipants.conversationId, params.id),
-    ),
-    with: {
-      conversation: {
-        with: {
-          participants: {
-            with: {
-              user: true,
-            },
-          },
-          messages: true,
-        },
+
+  const participantsResponse = await db.execute(sql`
+    SELECT u.id as userId, u.created_at as joinedAt, p.id, handle, avatar, display_name as displayName 
+    FROM conversation_participants AS p
+    LEFT JOIN users AS u on p.user_id = u.id
+    WHERE conversation_id = ${params.id}
+  `);
+  const participants = participantSchema
+    .array()
+    .parse(participantsResponse.rows)
+    .reduce(
+      (acc, curr) => {
+        if (curr.userId === user.id) {
+          acc.user = curr;
+        } else {
+          acc.others.push(curr);
+        }
+
+        return acc;
       },
-    },
-  });
+      { user: {} as TParticipant, others: [] as TParticipant[] },
+    );
 
-  const messages = await db.query.conversationMessages.findMany({
-    where: eq(conversationMessages.conversationId, params.id),
-    with: {
-      participant: true,
-    },
-  });
+  const messagesResponse = await db.execute(sql`
+    SELECT m.id, text, m.created_at as createdAt, u.id as userId, handle, avatar, display_name as displayName 
+    FROM conversation_messages AS m
+    LEFT JOIN conversation_participants AS p ON p.id = m.conversation_participant_id
+    LEFT JOIN users AS u ON p.user_id = u.id
+    WHERE m.conversation_id = ${params.id}
+    ORDER BY m.created_at DESC
+    LIMIT 18 
+    `);
 
-  if (!participant) {
-    return <div>Do not belong in conversation</div>;
-  }
+  const messages = messageSchema.array().parse(messagesResponse.rows).reverse();
 
-  const otherParticipant = participant.conversation.participants[0].user;
   return (
-    <div className="flex h-[100dvh] flex-col  overflow-hidden">
-      <div className="flex justify-between p-4">
-        <p className="text-lg font-semibold text-white/90">
-          {participant.conversation.participants[0].user.displayName}
-        </p>
-        <Link href={"/messages/" + params.id + "/info"}>
-          <InfoIcon size={20} />
+    <div className="flex h-[100dvh] flex-col">
+      <Header conversationId={params.id} participants={participants.others} />
+      {participants.others.length === 1 && (
+        <Link
+          href={`/${participants.others[0].handle}`}
+          className="flex flex-col items-center gap-1 border-b border-white/20 py-4 transition-colors hover:bg-neutral-600/20"
+        >
+          <Avatar className="h-14 w-14" src={participants.others[0].avatar} />
+          <p>{participants.others[0].displayName}</p>
+          <p className="text-neutral-600">@{participants.others[0].handle}</p>
+          <p className="flex items-center gap-1 text-xs text-neutral-600">
+            Joined{" "}
+            {participants.others[0].joinedAt.toLocaleDateString("en-us", {
+              month: "long",
+              year: "numeric",
+            })}
+          </p>
         </Link>
-      </div>
-
-      <div className="flex-1 overflow-hidden">
-        <div className="flex h-full flex-col  overflow-hidden">
-          <ul className="flex flex-1 flex-col gap-2 overflow-y-auto px-4">
-            <div className="flex flex-col items-center justify-center">
-              <Avatar
-                src={otherParticipant.avatar ?? ""}
-                className="h-16 w-16"
-              />
-              <p>{otherParticipant.displayName}</p>
-              <p>@{otherParticipant.handle}</p>
-            </div>
-            {messages.map((msg, i) => (
-              <Message
-                key={msg.id}
-                userId={user.id}
-                participant={msg.participant}
-              >
-                {msg.text}
-              </Message>
-            ))}
-            <NewMessages
-              conversationId={participant.conversationId}
-              userId={user.id}
-            />
-          </ul>
-          <div className="border-t border-white/20 p-2">
-            <ChatInput
-              conversationId={participant.conversationId}
-              participantId={participant.id}
-            />
-          </div>
-        </div>
-      </div>
+      )}
+      <Conversation userId={user.id} id={params.id} messages={messages} />
+      <ChatInput
+        conversationId={params.id}
+        participantId={participants.user.id}
+        avatar={user.avatar}
+      />
     </div>
   );
 }
+
+const Header = ({
+  conversationId,
+  participants,
+}: {
+  participants: TParticipant[];
+  conversationId: string;
+}) => {
+  return (
+    <header className="flex justify-between gap-3 p-4">
+      <Link href="/messages" className="laptop:hidden">
+        <ArrowLeftIcon size={20} />
+      </Link>
+
+      <AvatarGrid
+        images={participants.map((i) => i.avatar)}
+        className="h-6 w-6"
+      />
+
+      <Participants participants={participants} />
+
+      <Link href={"/messages/" + conversationId + "/info"}>
+        <InfoIcon size={20} />
+      </Link>
+    </header>
+  );
+};
+
+const Participants = ({ participants }: { participants: TParticipant[] }) => {
+  return (
+    <ul className="flex flex-1 gap-2">
+      {participants.map((p, i) => {
+        return (
+          <li>
+            {p.displayName}
+            {i < participants.length - 1 && ", "}
+          </li>
+        );
+      })}
+    </ul>
+  );
+};

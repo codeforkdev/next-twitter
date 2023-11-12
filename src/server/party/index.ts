@@ -1,27 +1,20 @@
 import type * as Party from "partykit/server";
 
-export default class ConversationServer implements Party.Server {
+export default class PostServer implements Party.Server {
   constructor(readonly party: Party.Party) {}
+  messages = [];
 
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {}
 
   onMessage(message: string, sender: Party.Connection) {
-    this.party.broadcast(message);
+    this.party.broadcast(message, [sender.id]);
   }
 
   async onRequest(request: Party.Request) {
     if (request.method === "POST") {
-      const payload = await request.json<{
-        id: string;
-        conversationId: string;
-        participantId: string;
-        text: string;
-      }>();
-
+      const payload = await request.json<any>();
       this.party.broadcast(JSON.stringify(payload));
     }
     return new Response("ok");
   }
 }
-
-ConversationServer satisfies Party.Worker;

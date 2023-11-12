@@ -1,34 +1,8 @@
-import { conversationParticipants } from "@/server/db/schema";
-import ConversationListItem, { Indicator } from "./ConversationListItem";
-import { eq, sql } from "drizzle-orm";
+import ConversationListItem from "./ConversationListItem";
+import { sql } from "drizzle-orm";
 import db from "@/server/db";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { Avatar } from "@/app/_components/Avatar";
 import { idSchema } from "@/schemas";
 import { z } from "zod";
-import { MoreHorizontal, Users2 } from "lucide-react";
-
-const getConversations = async (userId: string) => {
-  const things = await db.query.conversationParticipants.findMany({
-    where: eq(conversationParticipants.userId, userId),
-    with: {
-      conversation: {
-        with: {
-          participants: {
-            with: {
-              user: true,
-            },
-          },
-          messages: {
-            limit: 1,
-          },
-        },
-      },
-    },
-  });
-  return things.map((c) => c.conversation);
-};
 
 export default async function ConversationsList({
   userId,
@@ -45,21 +19,8 @@ export default async function ConversationsList({
   const query = sql.empty();
   const conversationIds = idSchema.array().parse(response.rows);
 
-  const conversationTileSchema = z.object({
-    conversationId: z.string(),
-    messageId: z.string(),
-    text: z.string(),
-    createdAt: z.coerce.date(),
-    participantId: z.string(),
-    userId: z.string(),
-    avatar: z.string(),
-    handle: z.string(),
-    displayName: z.string(),
-  });
-
   const schema = z.object({
     conversationId: z.string(),
-    // participantId: z.string(),
     latestMessage: z.string().nullable(),
     createdAt: z.coerce.date(),
     messageCreatedAt: z.coerce.date(),
@@ -142,14 +103,11 @@ export default async function ConversationsList({
       new Map(),
     );
 
-    console.log(result);
-    console.log(result.keys());
-
     return (
       <ol className="flex flex-col gap-[2px]">
         {[...result.values()].map((tile) => {
           return (
-            <li>
+            <li key={tile.id}>
               <ConversationListItem
                 id={tile.id}
                 latestMessage={tile.latestMessage}
@@ -159,28 +117,7 @@ export default async function ConversationsList({
             </li>
           );
         })}
-        {/* {conversationTiles.map((tile) => {
-          return (
-            <li className="flex">
-              <Link
-                href={"/messages/" + tile.conversationId}
-                className={cn(
-                  "flex flex-1 items-center gap-4 px-5 py-3 transition-colors duration-200 hover:bg-white/10",
-                )}
-              >
-                <Avatar src={tile.avatar} />
-                <div className="flex-1">
-                  <p>{tile.displayName}</p>
-                  <p>hello there</p>
-                </div>
-              </Link>
-            </li>
-          );
-        })} */}
       </ol>
     );
   }
-
-  return <div></div>;
-  // const conversations = await getConversations(userId);
 }

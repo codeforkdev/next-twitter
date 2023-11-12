@@ -20,12 +20,12 @@ async function seedUsers() {
     },
   ];
 
-  for (let i = 2; i < 5; i++) {
+  for (let i = 2; i < 10; i++) {
     users.push({
       id: nanoid(),
       displayName: faker.person.fullName(),
       handle: faker.person.firstName(),
-      avatar: faker.image.avatarGitHub(),
+      avatar: faker.image.avatar(),
       email: faker.internet.email(),
       password: "123456",
     });

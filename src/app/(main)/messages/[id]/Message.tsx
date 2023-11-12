@@ -1,9 +1,10 @@
 import { cn } from "@/lib/utils";
-import { conversationParticipants } from "@/server/db/schema";
 
 type MessageProps = {
   children: React.ReactNode;
-  participant: typeof conversationParticipants.$inferSelect;
+  participant: { userId: string };
+  id: string;
+  createdAt: Date;
   userId: string;
 };
 
@@ -12,12 +13,14 @@ export const Message = (props: MessageProps) => {
 
   return (
     <li
+      id={props.id}
+      data-message
       className={cn("flex w-full", {
         "justify-end": isMe,
       })}
     >
       <div
-        className={cn("flex max-w-[75%] flex-col ", {
+        className={cn("flex w-full max-w-[75%] flex-col ", {
           "items-end": isMe,
         })}
       >
