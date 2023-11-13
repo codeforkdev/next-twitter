@@ -94,34 +94,39 @@ export default function CredentialAuth() {
   );
 }
 
-function Input({
-  onInput,
-  placeholder,
-  error,
-}: {
-  placeholder: string;
-  onInput: (e: FormEvent<HTMLInputElement>) => void;
+interface InputProps extends React.ComponentPropsWithoutRef<"input"> {
   error: boolean;
-}) {
+  inputStyles?: string;
+  containerStyles?: string;
+  placeholderStyles?: string;
+}
+
+export function Input(props: InputProps) {
   const [focused, setFocused] = useState<"focused" | "unfocused">("unfocused");
   return (
     <motion.div
       animate={focused}
+      initial={{
+        borderColor: "#404040",
+      }}
       variants={{
         focused: {
-          borderColor: error ? "red" : "#1d9bf0",
+          borderColor: props.error ? "red" : "#1d9bf0",
         },
         unfocused: {
-          borderColor: error ? "red" : "#4b5563",
+          borderColor: props.error ? "red" : "#404040",
         },
       }}
-      className="relative w-full border border-white/30 "
+      className={cn("relative w-full border", props.containerStyles)}
     >
       <motion.input
-        onFocus={() => {
+        onFocus={(e) => {
           setFocused("focused");
+          props.onFocus && props.onFocus(e);
         }}
-        onInput={(e) => onInput(e)}
+        onInput={(e) => {
+          props.onInput && props.onInput(e);
+        }}
         onBlur={(e) => {
           if (e.currentTarget.value.trim()) {
           } else {
@@ -130,7 +135,10 @@ function Input({
         }}
         type="text"
         name="name"
-        className="w-full bg-transparent p-2 pt-5 outline-none"
+        className={cn(
+          "w-full bg-transparent p-2 pt-5 outline-none",
+          props.inputStyles,
+        )}
       />
       <motion.p
         initial={{
@@ -144,7 +152,7 @@ function Input({
             top: 12,
             left: 10,
             fontSize: "12px",
-            // color: error ? "red" : "#1d9bf0",
+            color: props.error ? "red" : "#1d9bf0",
           },
           unFocused: {
             top: "50%",
@@ -155,9 +163,9 @@ function Input({
         transition={{
           duration: 0.1,
         }}
-        className={cn("pointer-events-none")}
+        className={cn("pointer-events-none", props.placeholderStyles)}
       >
-        {placeholder}
+        {props.placeholder}
       </motion.p>
     </motion.div>
   );
