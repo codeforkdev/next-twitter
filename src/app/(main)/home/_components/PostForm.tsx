@@ -24,6 +24,7 @@ import PollForm from "./PollForm";
 
 const MAXTEXT = 500;
 export function PostForm() {
+  const [type, setType] = useState<"poll" | "post">("post");
   const user = useContext(UserContext);
   const [text, setText] = useState("");
   const [progress, setProgress] = useState(0);
@@ -44,8 +45,8 @@ export function PostForm() {
   }, [text]);
   return (
     <div
-      className="hidden gap-4  border-b border-white/20 px-3 py-2 tablet:flex"
-      onClick={() => inputRef.current?.focus()}
+      className="hidden gap-4   border-white/20 px-3 py-2 tablet:flex"
+      onClick={() => type === "post" && inputRef.current?.focus()}
     >
       <Link
         href={"/" + user.handle}
@@ -56,7 +57,7 @@ export function PostForm() {
       </Link>
 
       <div className="flex-1">
-        {showAudienceSettings && (
+        {showAudienceSettings && type !== "poll" && (
           <>
             <button className=" flex w-fit items-center gap-[2px] rounded-full border border-blue-300/50 px-3 py-[1px] text-sm text-primary">
               <span className="font-semibold">Everyone</span>
@@ -68,16 +69,26 @@ export function PostForm() {
         )}
 
         <Spacer className="my-4" />
+
         <div>
           <TextareaAutoSize
             className="min-h-[45px] w-full resize-none bg-transparent text-xl outline-none placeholder:text-gray-400/70"
-            placeholder="What is happenings?!"
+            placeholder={
+              type === "post" ? "What is happenings?!" : "Ask a question"
+            }
             ref={inputRef}
             onInput={(e) => setText(e.currentTarget.value)}
             minRows={1}
             onFocus={() => setShowAudienceSettings(true)}
           />
           <div className="my-2" />
+
+          {type === "poll" && (
+            <>
+              <PollForm close={() => setType("post")} />
+              <Spacer className="my-2" />
+            </>
+          )}
           {showAudienceSettings && (
             <>
               <div className="flex items-center gap-[4.75px] text-primary">
@@ -90,8 +101,65 @@ export function PostForm() {
             </>
           )}
         </div>
+
         {/* OPTIONS */}
+        <div className="flex items-center gap-1 px-1 text-primary">
+          <Option>
+            <ImageIcon size={18} />
+          </Option>
+          <Option>
+            <span className="rounded-sm border border-primary text-[8px] font-semibold">
+              GIF
+            </span>
+          </Option>
+          <Option onClick={() => setType("poll")}>
+            <ListTodoIcon size={18} />
+          </Option>
+          <Option>
+            <CalendarCheck2 size={18} />
+          </Option>
+          <Option>
+            <MapPin size={18} />
+          </Option>
+          <div className="ml-auto flex items-center gap-4">
+            {0 !== 0 && (
+              <CircularProgressbar
+                value={0}
+                className=" h-6 w-6 stroke-white/30"
+                styles={{
+                  path: { stroke: "#1d9bf0" },
+                }}
+              />
+            )}
+
+            <button
+              // onClick={handleSubmit}
+              disabled={true}
+              className=" rounded-full bg-primary px-4 py-1 font-semibold text-white disabled:bg-primary/70 disabled:text-white/70"
+            >
+              Post
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+interface OptionProps extends React.ComponentPropsWithoutRef<"button"> {}
+const Option = (props: OptionProps) => {
+  return (
+    <button
+      {...props}
+      onClick={(e) => {
+        e.preventDefault();
+        props.onClick && props.onClick(e);
+      }}
+      className={cn(
+        "flex h-8 w-8 items-center justify-center rounded-full hover:bg-primary/10",
+        props.className,
+      )}
+    >
+      {props.children}
+    </button>
+  );
+};
