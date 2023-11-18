@@ -72,7 +72,7 @@ function MobileSideNav({
         duration: 0.2,
         ease: "linear",
       }}
-      className="h-full w-full overflow-y-auto border-r-4 border-gray-400/50 bg-black "
+      className="h-full w-full overflow-y-auto  bg-black "
     >
       <div className="flex items-center justify-between p-4">
         <Avatar src={user.avatar ?? ""} className="h-10 w-10" />

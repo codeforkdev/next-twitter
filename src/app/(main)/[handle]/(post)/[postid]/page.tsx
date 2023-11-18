@@ -21,6 +21,7 @@ import PostsList from "@/app/_components/Post/PostsList";
 import { idSchema } from "@/schemas";
 import ParentPost from "./_components/ParentPost";
 import PostReply from "./_components/PostReply";
+import { Aside } from "@/app/(main)/home/layout";
 
 export default async function Page({ params }: { params: { postid: string } }) {
   const {
@@ -68,10 +69,10 @@ export default async function Page({ params }: { params: { postid: string } }) {
           <div className="px-4">
             <PostReply postId={main.id} {...user} userId={user.id} />
           </div>
-          <PostsList posts={comments} />
+          <PostsList userId={user.id} posts={comments} />
         </>
       }
-      aside={<></>}
+      aside={<Aside />}
     />
   );
 }

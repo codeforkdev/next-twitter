@@ -1,7 +1,6 @@
 import Image from "next/image";
 import React from "react";
 import Link from "next/link";
-import { PostForm } from "./_components/PostForm";
 import { ScrollInView } from "@/app/_components/ScrollInView";
 import Tab from "./_components/Tab";
 import MobileSideNavToggle from "@/app/_components/Navigation/MobileSideNavToggle";
@@ -9,7 +8,7 @@ import { MainLayout } from "@/app/_layouts/MainLayout";
 import SearchUsers from "./SearchUsers";
 import { Spacer } from "@/app/_components/Spacer";
 import { SettingsIcon } from "lucide-react";
-import Forms from "./_components/Forms";
+import { PostForm } from "./_components/PostForm";
 
 export default async function Layout({
   children,
@@ -21,8 +20,8 @@ export default async function Layout({
       main={
         <>
           <Header />
-          {/* <PostForm /> */}
-          <Forms />
+          <Spacer className={"py-2"} />
+          <PostForm />
           <NewPostsIndicator />
           {children}
         </>

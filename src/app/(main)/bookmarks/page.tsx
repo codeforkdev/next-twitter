@@ -18,27 +18,39 @@ export default async function Page() {
     const response = await db.execute(
       sql`
       SELECT 
-        posts.id,
-        posts.user_Id as authorId
+        posts.id
       FROM bookmarks   
       LEFT JOIN posts ON bookmarks.post_id = posts.id
       WHERE bookmarks.user_id = ${user.id}
       `,
     );
 
+    console.log(response.rows);
+
     const postIds = idSchema.array().parse(response.rows);
 
     if (postIds.length === 0) {
       return (
-        <>
-          <Spacer className="mt-[1.9rem]" />
-          <div className="mx-auto flex max-w-sm flex-col gap-2 px-5">
-            <p className="text-3xl font-bold">Save posts for later</p>
-            <p className="text-sm text-gray-300/50">
-              Bookmark posts to easily find them again in the future.
-            </p>
-          </div>
-        </>
+        <MainLayout
+          main={
+            <>
+              <div className="flex flex-col">
+                <div className="border-b border-white/20">
+                  <p className="text-xl font-bold">Bookmarks</p>
+                  <p className="text-xs text-gray-300/50">@{user.handle}</p>
+                </div>
+                <Spacer className="mt-[1.9rem]" />
+                <div className="mx-auto flex max-w-sm flex-col gap-2 px-5">
+                  <p className="text-3xl font-bold">Save posts for later</p>
+                  <p className="text-sm text-gray-300/50">
+                    Bookmark posts to easily find them again in the future.
+                  </p>
+                </div>
+              </div>
+            </>
+          }
+          aside={<Aside />}
+        />
       );
     }
 
@@ -48,7 +60,7 @@ export default async function Page() {
       <MainLayout
         main={
           <>
-            <div className="flex px-4 py-1.5">
+            <div className="flex border-b border-white/20 px-4 py-1.5">
               <div>
                 <p className="text-xl font-bold">Bookmarks</p>
                 <p className="text-xs text-gray-300/50">@{user.handle}</p>
@@ -57,7 +69,7 @@ export default async function Page() {
                 <MoreHorizontal size={20} />
               </button>
             </div>
-            <PostsList posts={posts} />
+            <PostsList userId={user.id} posts={posts} />
           </>
         }
         aside={<Aside />}

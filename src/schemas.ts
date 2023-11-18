@@ -3,6 +3,7 @@ import { z } from "zod";
 export const postSchema = z.object({
   id: z.string(),
   parentId: z.string().nullable(),
+  pollId: z.string().nullable(),
   text: z.string(),
   createdAt: z.coerce.date(),
   authorId: z.string(),

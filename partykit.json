@@ -4,6 +4,7 @@
   "compatibilityDate": "2023-10-03",
   "parties": {
     "post": "src/server/party/post.ts",
-    "chat": "src/server/party/chat.ts"
+    "chat": "src/server/party/chat.ts",
+    "poll": "src/server/party/poll.ts"
   }
 }

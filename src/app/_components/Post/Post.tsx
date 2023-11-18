@@ -2,21 +2,26 @@ import { Avatar } from "../Avatar";
 import LinkNoPropagation from "./LinkStopProp";
 import ProfileHoverCard from "./ProfileHoverCard";
 import { MoreHorizontalIcon } from "lucide-react";
+import { Suspense } from "react";
 import {
   BookmarkButton,
   CommentsButton,
   LikeButton,
-  Reactions,
   ReactionsProvider,
   RepostButton,
   ViewsButton,
 } from "./Reactions";
 import PostLink from "./PostLink";
 import StopPropagation from "../StopPropagation";
+import { cn } from "@/lib/utils";
+import Loading from "@/app/(main)/home/loading";
+import Poll from "./Poll";
 
 type Props = {
   id: string;
   text: string;
+  pollId: string | null;
+  userId: string;
   metrics: {
     likes: number;
     comments: number;
@@ -67,12 +72,13 @@ export function PostHeader(props: {
     </header>
   );
 }
+
 export default function Post(props: Props) {
-  const { metrics, viewer, author, id, text } = props;
+  const { metrics, viewer, author, id, text, userId } = props;
 
   return (
     <PostLink handle={author.handle} id={id}>
-      <div className="flex cursor-pointer gap-3">
+      <div className={cn("flex cursor-pointer gap-3", {})}>
         <section>
           <LinkNoPropagation href={`/${author.handle}`}>
             <Avatar src={author.avatar} />
@@ -84,6 +90,12 @@ export default function Post(props: Props) {
           <div className="max-w-full grow-0 break-words py-2 text-gray-200">
             {text}
           </div>
+          {/* poll here if exists */}
+          {props.pollId && (
+            <Suspense fallback={<Loading />}>
+              <Poll id={props.pollId} userId={userId} />
+            </Suspense>
+          )}
           <ReactionsProvider
             postId={id}
             liked={viewer.liked}

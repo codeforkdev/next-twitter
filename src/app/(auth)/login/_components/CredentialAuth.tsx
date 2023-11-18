@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { forwardRef } from "react";
 import { Spacer } from "@/app/_components/Spacer";
 import { motion } from "framer-motion";
 import { FormEvent, useState } from "react";
@@ -101,7 +101,9 @@ interface InputProps extends React.ComponentPropsWithoutRef<"input"> {
   placeholderStyles?: string;
 }
 
-export function Input(props: InputProps) {
+type Ref = HTMLInputElement;
+
+export const Input = forwardRef<Ref, InputProps>((props, ref) => {
   const [focused, setFocused] = useState<"focused" | "unfocused">("unfocused");
   return (
     <motion.div
@@ -120,12 +122,16 @@ export function Input(props: InputProps) {
       className={cn("relative w-full border", props.containerStyles)}
     >
       <motion.input
+        ref={ref}
         onFocus={(e) => {
           setFocused("focused");
           props.onFocus && props.onFocus(e);
         }}
         onInput={(e) => {
           props.onInput && props.onInput(e);
+        }}
+        onChange={(e) => {
+          props.onChange && props.onChange(e);
         }}
         onBlur={(e) => {
           if (e.currentTarget.value.trim()) {
@@ -169,7 +175,7 @@ export function Input(props: InputProps) {
       </motion.p>
     </motion.div>
   );
-}
+});
 
 function Loading({
   className,

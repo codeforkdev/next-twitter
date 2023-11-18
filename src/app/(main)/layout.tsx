@@ -28,7 +28,7 @@ function Container({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        "mx-auto h-full w-full",
+        "mx-auto  w-full ",
         "tablet:flex tablet:max-w-[700px] tablet:flex-row tablet:border-green-500",
         "laptop:max-w-[1000px] laptop:border-red-500",
         "desktop:max-w-[1258px] desktop:border-blue-500",

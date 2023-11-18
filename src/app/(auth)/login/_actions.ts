@@ -1,9 +1,7 @@
 "use server";
 
-import { SelectUserSchema, UserSchemaNoPassword } from "@/app/db/stores/User";
 import db from "@/server/db";
 import { users } from "@/server/db/schema";
-import { BaseError } from "@/types";
 import { and, eq, or } from "drizzle-orm";
 import { SignJWT } from "jose";
 import { nanoid } from "nanoid";
@@ -13,6 +11,7 @@ type Result<T> = { success: true; data: T } | { success: false; error: string };
 
 type LoginParams = { name: string; password: string };
 export async function login(params: LoginParams): Promise<Result<{}>> {
+  console.log("LOGGING IN ", params);
   let user: typeof users.$inferSelect | undefined;
   try {
     user = await db.query.users.findFirst({

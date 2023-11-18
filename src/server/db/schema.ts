@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   char,
+  datetime,
   mysqlTable,
   timestamp,
   varchar,
@@ -107,6 +108,7 @@ export const posts = mysqlTable("posts", {
   repost: boolean("repost").notNull().default(false),
   userId: char("user_id", { length: 21 }).notNull(),
   text: varchar("text", { length: 500 }).notNull(),
+  pollId: varchar("poll_id", { length: 21 }),
   createdAt,
 });
 
@@ -114,6 +116,10 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
   author: one(users, {
     fields: [posts.userId],
     references: [users.id],
+  }),
+  poll: one(polls, {
+    fields: [posts.pollId],
+    references: [polls.id],
   }),
   bookmarks: many(bookmarks),
   likes: many(likes),
@@ -183,3 +189,56 @@ export const followings = mysqlTable("following", {
   followerId: varchar("follower_id", { length: 21 }).notNull(),
   followingId: varchar("following_id", { length: 21 }).notNull(),
 });
+
+export const polls = mysqlTable("polls", {
+  id,
+  postId: varchar("post_id", { length: 21 }).notNull(),
+  authorId: varchar("author_id", { length: 21 }).notNull(),
+  expiry: datetime("expiry", { mode: "date" }).notNull(),
+  createdAt,
+});
+
+export const pollRelations = relations(polls, ({ one, many }) => ({
+  post: one(posts, {
+    fields: [polls.postId],
+    references: [posts.id],
+  }),
+  author: one(users, {
+    fields: [polls.authorId],
+    references: [users.id],
+  }),
+  options: many(pollOptions),
+}));
+
+export const pollOptions = mysqlTable("poll_options", {
+  id,
+  pollId: varchar("poll_id", { length: 21 }).notNull(),
+  text: varchar("text", { length: 25 }).notNull(),
+  createdAt,
+});
+
+export const pollOptionRelations = relations(pollOptions, ({ one, many }) => ({
+  poll: one(polls, {
+    fields: [pollOptions.pollId],
+    references: [polls.id],
+  }),
+  votes: many(pollOptionVotes),
+}));
+
+export const pollOptionVotes = mysqlTable("poll_option_votes", {
+  id,
+  pollId: varchar("poll_id", { length: 21 }).notNull(),
+  optionId: varchar("option_id", { length: 21 }).notNull(),
+  voterId: varchar("voter_id", { length: 21 }).notNull(),
+  createdAt,
+});
+
+export const pollOptionVotesRelations = relations(
+  pollOptionVotes,
+  ({ one, many }) => ({
+    option: one(pollOptions, {
+      fields: [pollOptionVotes.optionId],
+      references: [pollOptions.id],
+    }),
+  }),
+);

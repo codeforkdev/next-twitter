@@ -1,7 +1,13 @@
 import { TPostSchema } from "@/schemas";
 import Post from "./Post";
 
-export default function PostsList({ posts }: { posts: TPostSchema[] }) {
+export default function PostsList({
+  posts,
+  userId,
+}: {
+  posts: TPostSchema[];
+  userId: string;
+}) {
   return (
     <ul>
       {posts.map((post) => (
@@ -11,6 +17,7 @@ export default function PostsList({ posts }: { posts: TPostSchema[] }) {
         >
           <Post
             {...post}
+            userId={userId}
             author={{ ...post }}
             metrics={{ ...post }}
             viewer={{ ...post }}

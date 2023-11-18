@@ -10,14 +10,14 @@ export const getPostQuery = (params: TPostParams) => {
   const { postId, viewerId } = params;
   return sql.raw(
     `
-        SELECT 
-        *
+        SELECT *
         FROM (
           SELECT 
           'link' as link,
             id, 
             text, 
             parent_id as parentId,
+            poll_id as pollId,
             created_at as createdAt
             FROM posts WHERE id = '${postId}'
         ) as post 

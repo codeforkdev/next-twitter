@@ -49,6 +49,7 @@ export async function submitReply({
       data: { comments: postComments.length },
     }),
   });
+  revalidatePath("/");
 }
 
 export const likePost = async (userId: string, postId: string) => {
@@ -100,11 +101,14 @@ type BroadcastProps<T> = {
   roomId: string;
   data: T;
 };
-export const broadcast = <T>(params: BroadcastProps<T>) => {
-  fetch(`http://localhost:1999/parties/${params.party}/${params.roomId}`, {
-    method: "POST",
-    body: JSON.stringify(params.data),
-  });
+export const broadcast = async <T>(params: BroadcastProps<T>) => {
+  await fetch(
+    `http://localhost:1999/parties/${params.party}/${params.roomId}`,
+    {
+      method: "POST",
+      body: JSON.stringify(params.data),
+    },
+  );
 };
 
 const getLikesCount = async (postId: string) => {

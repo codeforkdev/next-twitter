@@ -118,7 +118,7 @@ const Logo = () => {
 
 export const DesktopNavbar = () => {
   return (
-    <nav className="sticky top-0 hidden h-[100dvh] w-[100px] border-r border-white/20 tablet:block desktop:w-[320px]">
+    <nav className="sticky top-0 hidden h-[100dvh] w-[100px] tablet:block desktop:w-[320px]">
       <ul className="flex h-full w-full flex-col items-center pt-[.3px] tablet:items-center desktop:items-start">
         <NavLink label="" url="/home" icon={<Logo />} />
         <NavLink label="Home" url="/home" icon={<HomeIcon />} />
