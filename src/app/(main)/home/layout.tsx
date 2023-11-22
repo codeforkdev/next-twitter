@@ -8,7 +8,7 @@ import { MainLayout } from "@/app/_layouts/MainLayout";
 import SearchUsers from "./SearchUsers";
 import { Spacer } from "@/app/_components/Spacer";
 import { SettingsIcon } from "lucide-react";
-import { PostForm } from "./_components/PostForm";
+import Post, { PostForm } from "./_components/PostForm";
 
 export default async function Layout({
   children,
@@ -21,7 +21,7 @@ export default async function Layout({
         <>
           <Header />
           <Spacer className={"py-2"} />
-          <PostForm />
+          <Post />
           <NewPostsIndicator />
           {children}
         </>

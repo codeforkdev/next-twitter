@@ -33,7 +33,7 @@ const schema = z.object({
 
 type Schema = z.infer<typeof schema>;
 
-export const PostFormContext = createContext<{
+type TPostFormContext = {
   form: UseFormReturn<Schema>;
   submit: () => void;
   appendPollOption: () => void;
@@ -59,7 +59,11 @@ export const PostFormContext = createContext<{
     "poll.options",
     "id"
   >[];
-} | null>(null);
+};
+
+export const PostFormContext = createContext<TPostFormContext>(
+  {} as TPostFormContext,
+);
 
 export default function PostFormProvider({
   children,

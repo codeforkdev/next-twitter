@@ -4,7 +4,11 @@ import PostFormProvider, { PostFormContext } from "./PostFormProvider";
 import TextareaAutoSize from "../../[handle]/(post)/[postid]/TextArea";
 import Link from "next/link";
 
+import { Grid } from "@giphy/react-components";
+import { GiphyFetch } from "@giphy/js-fetch-api";
+
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
+import * as Dialog from "@radix-ui/react-dialog";
 import { UserContext } from "../../UserProvider";
 import { Avatar } from "@/app/_components/Avatar";
 import {
@@ -20,6 +24,7 @@ import { Controller } from "react-hook-form";
 import { Input } from "@/app/(auth)/login/_components/CredentialAuth";
 import { cn } from "@/lib/utils";
 import { CircularProgressbar } from "react-circular-progressbar";
+import GiphyDialog from "./GiphyDialog";
 
 export default function Post() {
   return (
@@ -275,11 +280,7 @@ const Options = () => {
       <Option>
         <ImageIcon size={18} />
       </Option>
-      <Option>
-        <span className="rounded-sm border border-primary text-[8px] font-semibold">
-          GIF
-        </span>
-      </Option>
+      <GiphyDialog />
       <Option onClick={() => togglePoll()}>
         <ListTodoIcon size={18} />
       </Option>
