@@ -16,6 +16,7 @@ export const getPostQuery = (params: TPostParams) => {
           'link' as link,
             id, 
             text, 
+            giphy,
             parent_id as parentId,
             poll_id as pollId,
             created_at as createdAt

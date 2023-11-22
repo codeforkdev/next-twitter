@@ -4,11 +4,7 @@ import PostFormProvider, { PostFormContext } from "./PostFormProvider";
 import TextareaAutoSize from "../../[handle]/(post)/[postid]/TextArea";
 import Link from "next/link";
 
-import { Grid } from "@giphy/react-components";
-import { GiphyFetch } from "@giphy/js-fetch-api";
-
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
-import * as Dialog from "@radix-ui/react-dialog";
 import { UserContext } from "../../UserProvider";
 import { Avatar } from "@/app/_components/Avatar";
 import {
@@ -18,6 +14,7 @@ import {
   ImageIcon,
   ListTodoIcon,
   MapPin,
+  XIcon,
 } from "lucide-react";
 import { Spacer } from "@/app/_components/Spacer";
 import { Controller } from "react-hook-form";
@@ -25,6 +22,7 @@ import { Input } from "@/app/(auth)/login/_components/CredentialAuth";
 import { cn } from "@/lib/utils";
 import { CircularProgressbar } from "react-circular-progressbar";
 import GiphyDialog from "./GiphyDialog";
+import Image from "next/image";
 
 export default function Post() {
   return (
@@ -37,9 +35,7 @@ export default function Post() {
 export const PostForm = () => {
   const user = useContext(UserContext);
 
-  const formCtx = useContext(PostFormContext);
-  if (!formCtx) return null;
-  const { submit } = formCtx;
+  const { form, submit } = useContext(PostFormContext);
 
   return (
     <form
@@ -57,6 +53,22 @@ export const PostForm = () => {
       <div className="flex-1">
         <AudienceSettings />
         <PostTextInput />
+        {form.watch("giphy") && (
+          <div className="relative h-96 w-full overflow-clip rounded-lg">
+            <Image
+              src={form.getValues("giphy")}
+              alt=""
+              fill
+              style={{ aspectRatio: "1/1" }}
+            />
+            <button
+              onClick={() => form.setValue("giphy", null)}
+              className="absolute right-2 top-2 rounded-full bg-black/80 p-2 transition-colors hover:bg-neutral-500/50"
+            >
+              <XIcon size={16} />
+            </button>
+          </div>
+        )}
         <Poll />
         <AudienceIndicator />
         <div className="my-3 h-[1px] bg-white/20" />
@@ -271,23 +283,26 @@ const Poll = () => {
 };
 
 const Options = () => {
-  const { togglePoll } = useContext(PostFormContext);
+  const { togglePoll, form, showPoll } = useContext(PostFormContext);
   return (
     <div
       onClick={(e) => e.stopPropagation()}
       className="flex items-center gap-1 px-1 text-primary"
     >
-      <Option>
+      <Option disabled={form.watch("giphy") || showPoll ? true : false}>
         <ImageIcon size={18} />
       </Option>
-      <GiphyDialog />
-      <Option onClick={() => togglePoll()}>
+      <GiphyDialog disabled={form.watch("giphy") || showPoll ? true : false} />
+      <Option
+        disabled={form.watch("giphy") ? true : false}
+        onClick={() => togglePoll()}
+      >
         <ListTodoIcon size={18} />
       </Option>
-      <Option>
+      <Option disabled={showPoll}>
         <CalendarCheck2 size={18} />
       </Option>
-      <Option>
+      <Option disabled={form.watch("giphy") || showPoll ? true : false}>
         <MapPin size={18} />
       </Option>
     </div>
@@ -296,6 +311,7 @@ const Options = () => {
 
 interface OptionProps extends React.ComponentPropsWithoutRef<"button"> {}
 const Option = (props: OptionProps) => {
+  const { disabled } = props;
   return (
     <button
       {...props}
@@ -304,8 +320,10 @@ const Option = (props: OptionProps) => {
         props.onClick && props.onClick(e);
       }}
       className={cn(
-        "flex h-8 w-8 items-center justify-center rounded-full hover:bg-primary/10",
+        " flex h-8 w-8 items-center justify-center rounded-full",
         props.className,
+        { "bg-transparent text-gray-500/50": disabled },
+        { "hover:bg-primary/10": !disabled },
       )}
     >
       {props.children}

@@ -1,8 +1,9 @@
 import { Avatar } from "../Avatar";
 import LinkNoPropagation from "./LinkStopProp";
 import ProfileHoverCard from "./ProfileHoverCard";
-import { MoreHorizontalIcon } from "lucide-react";
+import { MoreHorizontalIcon, XIcon } from "lucide-react";
 import { Suspense } from "react";
+import Image from "next/image";
 import {
   BookmarkButton,
   CommentsButton,
@@ -22,6 +23,7 @@ type Props = {
   text: string;
   pollId: string | null;
   userId: string;
+  giphy: string | null;
   metrics: {
     likes: number;
     comments: number;
@@ -74,7 +76,7 @@ export function PostHeader(props: {
 }
 
 export default function Post(props: Props) {
-  const { metrics, viewer, author, id, text, userId } = props;
+  const { metrics, viewer, author, id, text, userId, giphy } = props;
 
   return (
     <PostLink handle={author.handle} id={id}>
@@ -90,6 +92,12 @@ export default function Post(props: Props) {
           <div className="max-w-full grow-0 break-words py-2 text-gray-200">
             {text}
           </div>
+          {giphy && (
+            <div className="relative h-96 w-full overflow-clip rounded-lg border border-neutral-700">
+              <Image src={giphy} alt="" fill style={{ aspectRatio: "1/1" }} />
+            </div>
+          )}
+
           {/* poll here if exists */}
           {props.pollId && (
             <Suspense fallback={<Loading />}>

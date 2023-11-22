@@ -8,7 +8,7 @@ import {
   useForm,
 } from "react-hook-form";
 import { z } from "zod";
-import { createPoll } from "../_actions";
+import { createGiphyPost, createPoll } from "../_actions";
 import { UserContext } from "../../UserProvider";
 
 const option = z.object({ value: z.string().trim() });
@@ -21,6 +21,7 @@ const options = option.array().transform(
 
 const schema = z.object({
   text: z.string().min(1, { message: "Required" }),
+  giphy: z.string().nullable(),
   poll: z.object({
     options,
     expiry: z.object({
@@ -105,7 +106,9 @@ export default function PostFormProvider({
 
   const submit = form.handleSubmit((data) => {
     console.log("form data: ", data);
-    const { text, poll } = data;
+    const { text, poll, giphy } = data;
+
+    console.log(data);
 
     if (showPoll) {
       if (!poll.options[0].value || !poll.options[1].value) return;
@@ -117,7 +120,18 @@ export default function PostFormProvider({
         expiry: poll.expiry,
       });
       togglePoll();
+      form.reset();
       return;
+    }
+
+    if (giphy) {
+      console.log("submit giphy post");
+      createGiphyPost({
+        userId: user.id,
+        text,
+        giphy,
+      });
+      form.reset();
     }
   });
 

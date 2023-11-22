@@ -1,11 +1,13 @@
 "use client";
 import { GiphyFetch } from "@giphy/js-fetch-api";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import { set } from "zod";
 import { ArrowLeftIcon, SearchIcon, XIcon } from "lucide-react";
 import Loading from "../loading";
+import { PostFormContext } from "./PostFormProvider";
+import { cn } from "@/lib/utils";
 
 const gf = new GiphyFetch("EaZP4OUfvWTYv2YbNYoOj0U2GQMfc6Up");
 const fetchGifs = (offset: number) => gf.categories({ offset, limit: 10 });
@@ -45,18 +47,24 @@ const categories = [
   },
 ];
 
-export default function GiphyDialog() {
+export default function GiphyDialog({ disabled }: { disabled: boolean }) {
+  const [open, setOpen] = useState(false);
   return (
-    <Dialog.Root>
-      <Dialog.Trigger>
-        <span className="rounded-sm border border-primary text-[8px] font-semibold">
+    <Dialog.Root open={open} onOpenChange={setOpen}>
+      <Dialog.Trigger disabled={disabled} className="flex items-center">
+        <span
+          className={cn("rounded-sm border p-0.5 text-[8px] font-semibold", {
+            "border-neutral-500/50 text-neutral-500": disabled,
+            "border-primary text-primary ": !disabled,
+          })}
+        >
           GIF
         </span>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-slate-600/30" />
         <Dialog.Content className="fixed left-1/2 top-10 z-50 w-full max-w-lg -translate-x-1/2  ">
-          <Content />
+          <Content close={() => setOpen(false)} />
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -85,12 +93,15 @@ const useDebounce = () => {
   return { debounce, isLoading };
 };
 
-const Content = () => {
+const Content = ({ close }: { close: () => void }) => {
   const { debounce, isLoading } = useDebounce();
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<
     { url: string; height: number; width: number }[]
   >([]);
+
+  const { form } = useContext(PostFormContext);
+
   useEffect(() => {
     gf.search("Deal with it", { limit: 20 }).then((res) => {
       const images = res.data.map(
@@ -100,7 +111,6 @@ const Content = () => {
   }, []);
 
   useEffect(() => {
-    console.log("RESULTS==============");
     if (!search) setResults([]);
     debounce(async () => {
       const res = await gf.search(search, { limit: 21 });
@@ -120,13 +130,14 @@ const Content = () => {
             <ArrowLeftIcon size={18} />
           </button>
         ) : (
-          <Dialog.Close className="">
+          <Dialog.Close>
             <XIcon size={18} />
           </Dialog.Close>
         )}
 
         <div className="flex flex-1 items-center gap-2 rounded-full border border-neutral-600 p-1">
           <SearchIcon size={18} className="shrink-0 text-neutral-600" />
+          <input type="text" value={""} className="hidden" />
           <input
             onInput={(e) => setSearch(e.currentTarget.value)}
             value={search}
@@ -159,7 +170,6 @@ const Content = () => {
                 objectFit="cover"
                 alt=""
               />
-              {/* <div className="absolute inset-0 h-full w-full bg-black/20" /> */}
               <div className="absolute inset-0 h-full w-full bg-gradient-to-b from-transparent via-transparent  to-black" />
               <p className="absolute bottom-2 left-2 text-xl font-semibold text-white">
                 {c.title}
@@ -171,7 +181,14 @@ const Content = () => {
       {results.length !== 0 && !isLoading && (
         <div className=" grid max-h-[500px] grid-cols-3 overflow-y-auto">
           {results.map((image) => (
-            <button className="relative h-32 border-2 border-transparent hover:border-primary">
+            <button
+              onClick={() => {
+                console.log("selected an gif", image.url);
+                form.setValue("giphy", image.url);
+                close();
+              }}
+              className="relative h-32 border-2 border-transparent hover:border-primary"
+            >
               <Image
                 src={image.url}
                 alt=""

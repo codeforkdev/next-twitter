@@ -5,6 +5,7 @@ export const postSchema = z.object({
   parentId: z.string().nullable(),
   pollId: z.string().nullable(),
   text: z.string(),
+  giphy: z.string().nullable(),
   createdAt: z.coerce.date(),
   authorId: z.string(),
   avatar: z.string(),

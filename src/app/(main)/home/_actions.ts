@@ -42,3 +42,17 @@ export async function createPoll(params: CreatePollParams) {
   });
   revalidatePath("/");
 }
+
+type CreateGiphyPostParams = {
+  userId: string;
+  text: string;
+  giphy: string;
+};
+export async function createGiphyPost({
+  userId,
+  text,
+  giphy,
+}: CreateGiphyPostParams) {
+  await db.insert(posts).values({ id: nanoid(), text, userId, giphy });
+  revalidatePath("/");
+}
