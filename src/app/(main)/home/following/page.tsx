@@ -18,7 +18,7 @@ export default async function Page() {
       postIds: idSchema.array().parse(postIds.rows),
     });
 
-    return <PostsList posts={posts} />;
+    return <PostsList userId={user.id} posts={posts} />;
   } catch (err) {
     const error = ensureError(err);
     throw new Error(error.message);
