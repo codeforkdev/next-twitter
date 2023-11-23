@@ -5,13 +5,15 @@ import { CheckCircleIcon } from "lucide-react";
 import usePartySocket from "partysocket/react";
 import { useContext, useState } from "react";
 
+type Option = {
+  id: string;
+  text: string;
+  pollId: string;
+  votes: number;
+};
+
 type Props = {
-  options: {
-    id: string;
-    text: string;
-    pollId: string;
-    votes: number;
-  }[];
+  options: Option[];
   votes: number;
   userVote: {
     id: string;
@@ -30,14 +32,13 @@ export default function PostMetrics(props: Props) {
     party: "poll",
     room: props.pollId,
     onMessage: (evt) => {
-      const data = JSON.parse(evt.data);
+      const data = JSON.parse(evt.data) as Option[];
       setOptions(data);
       const v = data.reduce((acc, curr) => {
         acc += curr.votes;
         return acc;
       }, 0);
       setVotes(v);
-      console.log(data);
     },
   });
 
