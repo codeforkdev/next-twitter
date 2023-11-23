@@ -1,4 +1,5 @@
 "use server";
+import { PKURL } from "@/app/_components/Post/constants";
 import db from "@/server/db";
 import { bookmarks, likes, posts } from "@/server/db/schema";
 import { and, eq, sql } from "drizzle-orm";
@@ -42,12 +43,10 @@ export async function submitReply({
     where: eq(posts.parentId, postId),
   });
 
-  fetch(`http://localhost:1999/parties/post/${postId}`, {
-    method: "POST",
-    body: JSON.stringify({
-      type: "comments",
-      data: { comments: postComments.length },
-    }),
+  broadcast({
+    party: "post",
+    roomId: postId,
+    data: { comments: postComments.length },
   });
   revalidatePath("/");
 }
@@ -77,10 +76,7 @@ export async function toggleLikePost(userId: string, postId: string) {
     const count = await getLikesCount(postId);
 
     try {
-      broadcast<{
-        type: "likes";
-        data: { userId: string; count: number; isLiked: boolean };
-      }>({
+      broadcast({
         party: "post",
         roomId: postId,
         data: {
@@ -102,13 +98,11 @@ type BroadcastProps<T> = {
   data: T;
 };
 export const broadcast = async <T>(params: BroadcastProps<T>) => {
-  await fetch(
-    `http://localhost:1999/parties/${params.party}/${params.roomId}`,
-    {
-      method: "POST",
-      body: JSON.stringify(params.data),
-    },
-  );
+  const url = PKURL + `/parties/${params.party}/${params.roomId}`;
+  await fetch(url, {
+    method: "POST",
+    body: JSON.stringify(params.data),
+  });
 };
 
 const getLikesCount = async (postId: string) => {
