@@ -12,8 +12,7 @@ export default async function ConversationsList({
   const response = await db.execute(sql`
     SELECT p.conversation_id as id 
     FROM conversation_participants AS p
-    JOIN users AS u on u.id = p.user_id
-    WHERE u.id = ${userId}
+    WHERE p.user_id = ${userId}
   `);
 
   const query = sql.empty();
