@@ -19,12 +19,13 @@ export default function Conversation(props: Props) {
   const top = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<TMessage[]>(props.messages ?? []);
 
-  const p = usePartySocket({
+  usePartySocket({
     room: props.id,
     host: PKURL,
     party: "chat",
 
     onMessage: (evt: MessageEvent) => {
+      console.log(evt);
       const msg = messageSchema.parse(JSON.parse(evt.data));
       setMessages((prev) => [...prev, msg]);
     },
