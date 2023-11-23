@@ -6,7 +6,7 @@ import { pollOptionVotes } from "@/server/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
-import { string, z } from "zod";
+import { z } from "zod";
 
 type SubmitPollVoteParams = {
   userId: string;

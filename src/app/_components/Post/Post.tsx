@@ -1,7 +1,7 @@
 import { Avatar } from "../Avatar";
 import LinkNoPropagation from "./LinkStopProp";
 import ProfileHoverCard from "./ProfileHoverCard";
-import { MoreHorizontalIcon, XIcon } from "lucide-react";
+import { MoreHorizontalIcon } from "lucide-react";
 import { Suspense } from "react";
 import Image from "next/image";
 import {

@@ -1,5 +1,5 @@
 import db from "@/server/db";
-import { pollOptionVotes, pollOptions } from "@/server/db/schema";
+import { pollOptionVotes } from "@/server/db/schema";
 import { eq, sql } from "drizzle-orm";
 import PollMetrics from "./PollMetrics";
 import PollOptions from "./PollOptions";

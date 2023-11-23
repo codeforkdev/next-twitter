@@ -3,12 +3,9 @@ import { submitReply, toggleBookmark, toggleLikePost } from "@/actions/posts";
 import { UserContext } from "@/app/(main)/UserProvider";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeftIcon,
   BarChart2,
   BookmarkIcon,
   CalendarCheck2Icon,
-  ChevronDownIcon,
-  Globe2Icon,
   HeartIcon,
   ImageIcon,
   ListTodoIcon,

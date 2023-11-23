@@ -1,9 +1,8 @@
 "use client";
 
-import { UserContext } from "@/app/(main)/UserProvider";
 import { CheckCircleIcon } from "lucide-react";
 import usePartySocket from "partysocket/react";
-import { useContext, useState } from "react";
+import { useState } from "react";
 
 type Option = {
   id: string;
