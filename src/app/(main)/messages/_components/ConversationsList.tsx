@@ -103,7 +103,7 @@ export default async function ConversationsList({
     );
 
     return (
-      <ol className="flex flex-col gap-[2px]">
+      <ol className="flex flex-col gap-[2px] ">
         {[...result.values()].map((tile) => {
           return (
             <li key={tile.id}>

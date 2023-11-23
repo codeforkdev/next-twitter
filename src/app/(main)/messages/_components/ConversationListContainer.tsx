@@ -41,14 +41,14 @@ export default function ConversationDynamicWindowLayout({
   return (
     <div className={cn("flex w-full")}>
       <div
-        className={cn("w-full border-r border-white/20 laptop:w-[390px]", {
+        className={cn("w-full border-x border-white/20 laptop:w-[390px]", {
           hidden: !pathname.endsWith("/messages") && width < 1000,
         })}
       >
         {list}
       </div>
       <div
-        className={cn("flex-1 border-r border-r-white/20", {
+        className={cn("flex-1 border-x border-white/20", {
           hidden: width < 1000 && pathname.endsWith("/messages"),
         })}
       >

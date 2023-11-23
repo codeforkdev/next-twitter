@@ -26,8 +26,10 @@ export default function Conversation(props: Props) {
 
     onMessage: (evt: MessageEvent) => {
       console.log(evt);
-      const msg = messageSchema.parse(JSON.parse(evt.data));
-      setMessages((prev) => [...prev, msg]);
+      const msg = messageSchema.safeParse(JSON.parse(evt.data));
+      if (msg.success) {
+        setMessages((prev) => [...prev, msg.data]);
+      }
     },
   });
 
