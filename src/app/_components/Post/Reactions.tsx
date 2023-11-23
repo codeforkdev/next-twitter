@@ -16,19 +16,16 @@ import {
   XIcon,
 } from "lucide-react";
 import usePartySocket from "partysocket/react";
-import Image from "next/image";
 import React, { useState, useContext, createContext } from "react";
 import { z } from "zod";
 import * as Dialog from "@radix-ui/react-dialog";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import PostProgress from "./Progress";
-import { TPostSchema } from "@/schemas";
 import { users } from "@/server/db/schema";
 import { Avatar } from "../Avatar";
-import { propagateServerField } from "next/dist/server/lib/render-server";
 import { Spacer } from "../Spacer";
+import { PKURL } from "./constants";
 type Props = {
   children: React.ReactNode;
   metrics: {
@@ -41,19 +38,6 @@ type Props = {
   bookmarked: boolean;
   postId: string;
 };
-
-// type Props2 = {
-//   children: React.ReactNode;
-//   metrics: {
-//     likes: number;
-//     comments: number;
-//     reposts: number;
-//     views: number;
-//   };
-//   liked: boolean;
-//   bookmarked: boolean;
-//   postId: string;
-// };
 
 type ReactionsContext = {
   postId: string;
@@ -88,7 +72,7 @@ export const ReactionsProvider = (props: Props) => {
   const [liked, setLiked] = useState(props.liked);
   const [bookmarked, setBookmarked] = useState(props.bookmarked);
   usePartySocket({
-    host: "http://localhost:1999",
+    host: PKURL,
     room: props.postId,
     party: "post",
     onMessage: (evt) => {
