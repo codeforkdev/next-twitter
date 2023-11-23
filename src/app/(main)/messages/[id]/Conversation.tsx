@@ -23,6 +23,7 @@ export default function Conversation(props: Props) {
   const p = usePartySocket({
     room: props.id,
     host: PKURL,
+    party: "chat",
 
     onMessage: (evt: MessageEvent) => {
       const msg = messageSchema.parse(JSON.parse(evt.data));
