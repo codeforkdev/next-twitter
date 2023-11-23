@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, forwardRef, useEffect } from "react";
 import PostFormProvider, { PostFormContext } from "./PostFormProvider";
 import TextareaAutoSize from "../../[handle]/(post)/[postid]/TextArea";
 import Link from "next/link";
@@ -17,7 +17,7 @@ import {
   XIcon,
 } from "lucide-react";
 import { Spacer } from "@/app/_components/Spacer";
-import { Controller } from "react-hook-form";
+import { Controller, useFieldArray } from "react-hook-form";
 import { Input } from "@/app/(auth)/login/_components/CredentialAuth";
 import { cn } from "@/lib/utils";
 import { CircularProgressbar } from "react-circular-progressbar";
@@ -35,7 +35,7 @@ export default function Post() {
 export const PostForm = () => {
   const user = useContext(UserContext);
 
-  const { form, submit } = useContext(PostFormContext);
+  const { form, showPoll, submit } = useContext(PostFormContext);
 
   return (
     <form
@@ -69,7 +69,7 @@ export const PostForm = () => {
             </button>
           </div>
         )}
-        <Poll />
+        {showPoll && <Poll />}
         <AudienceIndicator />
         <div className="my-3 h-[1px] bg-white/20" />
         <div className="flex">
@@ -136,16 +136,16 @@ const AudienceIndicator = () => {
   );
 };
 
-const NumberDropDown = ({
-  onChange,
-  label,
-  length,
-}: {
-  onChange: (val: number) => void;
+type Ref = HTMLInputElement;
+interface InputProps extends React.ComponentPropsWithoutRef<"input"> {
+  // onChange: (val: number) => void;
+  onSelected: (val: number) => void;
   label: string;
   length: number;
-}) => {
+}
+const NumberDropDown = forwardRef<Ref, InputProps>((props, ref) => {
   const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(0);
   return (
     <Dropdown.Root onOpenChange={setOpen}>
       <Dropdown.Trigger
@@ -162,7 +162,7 @@ const NumberDropDown = ({
               "text-primary": open,
             })}
           >
-            {label}
+            {props.label}
           </p>
           <p className="text-left">1</p>
         </div>
@@ -171,11 +171,18 @@ const NumberDropDown = ({
 
       <Dropdown.Portal>
         <Dropdown.Content className="w-[180px] rounded-lg border border-neutral-700 bg-black text-white">
+          <input
+            type="number"
+            value={value}
+            onChange={() => props.onSelected(value)}
+            hidden
+            ref={ref}
+          />
           {new Array(length).fill(null).map((_, i) => (
             <Dropdown.DropdownMenuItem
               key={i}
               className="px-2 hover:bg-primary"
-              onSelect={() => onChange(i)}
+              onSelect={() => setValue(i)}
             >
               {i}
             </Dropdown.DropdownMenuItem>
@@ -184,17 +191,26 @@ const NumberDropDown = ({
       </Dropdown.Portal>
     </Dropdown.Root>
   );
-};
+});
 
 const Poll = () => {
   const {
-    form: { control },
-    pollOptions,
-    appendPollOption,
-    showPoll,
+    form: { control, formState, setValue },
     togglePoll,
   } = useContext(PostFormContext);
-  if (!showPoll) return null;
+  const { fields, append, prepend } = useFieldArray({
+    control: control,
+    name: "poll.options",
+    keyName: "id",
+  });
+  useEffect(() => {
+    prepend({ value: "" });
+    prepend({ value: "" });
+
+    return () => setValue("poll", null);
+  }, []);
+  const appendPollOption = () => append({ value: "" });
+
   return (
     <div
       className="rounded-xl border border-neutral-700"
@@ -202,7 +218,7 @@ const Poll = () => {
     >
       <div className="gap-2 border-b border-white/20 p-4">
         <div className="flex flex-1 flex-col gap-2">
-          {pollOptions.map((f, index) => (
+          {fields.map((f, index) => (
             <Controller
               key={f.id}
               control={control}
@@ -226,7 +242,7 @@ const Poll = () => {
               )}
             />
           ))}
-          {pollOptions.length < 4 && (
+          {fields.length < 4 && (
             <button
               onClick={appendPollOption}
               className="my-2 w-full self-end rounded-lg border border-primary py-2 text-primary disabled:border-primary/30 disabled:text-primary/30"
@@ -240,7 +256,8 @@ const Poll = () => {
               name="poll.expiry.days"
               render={({ field, fieldState, formState }) => (
                 <NumberDropDown
-                  onChange={field.onChange}
+                  onSelected={field.onChange}
+                  ref={field.ref}
                   label={"Days"}
                   length={6}
                 />
@@ -251,7 +268,8 @@ const Poll = () => {
               name="poll.expiry.hours"
               render={({ field, fieldState, formState }) => (
                 <NumberDropDown
-                  onChange={field.onChange}
+                  ref={field.ref}
+                  onSelected={field.onChange}
                   label={"Hours"}
                   length={23}
                 />
@@ -262,7 +280,8 @@ const Poll = () => {
               name="poll.expiry.minutes"
               render={({ field, fieldState, formState }) => (
                 <NumberDropDown
-                  onChange={field.onChange}
+                  ref={field.ref}
+                  onSelected={field.onChange}
                   label={"Minutes"}
                   length={59}
                 />
@@ -284,23 +303,42 @@ const Poll = () => {
 
 const Options = () => {
   const { togglePoll, form, showPoll } = useContext(PostFormContext);
+
   return (
     <div
       onClick={(e) => e.stopPropagation()}
       className="flex items-center gap-1 px-1 text-primary"
     >
-      <Option disabled={form.watch("giphy") || showPoll ? true : false}>
-        <ImageIcon size={18} />
-      </Option>
-      <GiphyDialog disabled={form.watch("giphy") || showPoll ? true : false} />
+      <label
+        htmlFor="image"
+        className=" flex h-8 w-8 items-center justify-center"
+      >
+        {/* <Option disabled={form.watch("giphy") || showPoll ? true : false}> */}
+        <ImageIcon size={21} />
+        <input
+          {...form.register("image")}
+          id="image"
+          name="image"
+          accept="image/*"
+          type="file"
+          hidden
+        />
+        {/* </Option> */}
+      </label>
+
+      <div className="flex h-8 w-8 items-center justify-center">
+        <GiphyDialog
+          disabled={form.watch("giphy") || showPoll ? true : false}
+        />
+      </div>
       <Option
         disabled={form.watch("giphy") ? true : false}
         onClick={() => togglePoll()}
       >
-        <ListTodoIcon size={18} />
+        <ListTodoIcon size={21} />
       </Option>
       <Option disabled={showPoll}>
-        <CalendarCheck2 size={18} />
+        <CalendarCheck2 size={20} />
       </Option>
       <Option disabled={form.watch("giphy") || showPoll ? true : false}>
         <MapPin size={18} />

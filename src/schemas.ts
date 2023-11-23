@@ -6,6 +6,7 @@ export const postSchema = z.object({
   pollId: z.string().nullable(),
   text: z.string(),
   giphy: z.string().nullable(),
+  image: z.string().nullable(),
   createdAt: z.coerce.date(),
   authorId: z.string(),
   avatar: z.string(),

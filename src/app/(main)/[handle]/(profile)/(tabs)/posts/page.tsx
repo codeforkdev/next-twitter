@@ -1,27 +1,23 @@
-import Post from "@/app/_components/Post";
-import { db } from "../../../../../drizzle/db";
-import { users } from "../../../../../drizzle/schema";
-import { eq } from "drizzle-orm";
+import PostsList from "@/app/_components/Post/PostsList";
+import { verifyJWT } from "@/lib/auth";
+import { idSchema } from "@/schemas";
+import db from "@/server/db";
+import { getPosts } from "@/server/db/queries";
+import { sql } from "drizzle-orm";
 
 export default async function Page({ params }: { params: { handle: string } }) {
-  const user = await db.query.users.findFirst({
-    where: eq(users.handle, params.handle),
-    with: {
-      posts: {
-        with: {
-          likes: true,
-        },
-      },
-    },
-  });
+  const {
+    payload: { user },
+  } = await verifyJWT();
+
   if (!user) return <div>User not found</div>;
-  return (
-    <ul>
-      {user.posts.map((post) => (
-        <li className="px-4 py-4">
-          <Post author={user} {...post} isBookmarked={false} />
-        </li>
-      ))}
-    </ul>
-  );
+
+  const query = sql`SELECT id FROM posts WHERE user_id = ${user.id}`;
+  const postIds = await db.execute(query);
+  const posts = await getPosts({
+    viewerId: user.id,
+    postIds: idSchema.array().parse(postIds.rows),
+  });
+
+  return <PostsList posts={posts} userId={user.id} />;
 }

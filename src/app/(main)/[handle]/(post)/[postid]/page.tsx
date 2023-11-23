@@ -1,14 +1,6 @@
-import { Avatar } from "@/app/_components/Avatar";
 import { Spacer } from "@/app/_components/Spacer";
 import { eq, sql } from "drizzle-orm";
-import {
-  ArrowLeft,
-  Bookmark,
-  Heart,
-  MessageCircle,
-  Repeat2,
-  Share,
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import BackButton from "@/app/_components/BackButton";
 import { nanoid } from "nanoid";
 import db from "@/server/db";
@@ -64,7 +56,7 @@ export default async function Page({ params }: { params: { postid: string } }) {
       main={
         <>
           <Header />
-          <ParentPost {...main} />
+          <ParentPost {...main} userId={user.id} />
           <Spacer className="my-4" />
           <div className="px-4">
             <PostReply postId={main.id} {...user} userId={user.id} />

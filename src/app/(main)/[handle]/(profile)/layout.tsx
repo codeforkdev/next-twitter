@@ -1,12 +1,19 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { ArrowLeft, Calendar } from "lucide-react";
 import BackButton from "@/app/_components/BackButton";
 import Image from "next/image";
 import { faker } from "@faker-js/faker";
-import React from "react";
+import React, { Suspense } from "react";
 import Tabs from "./(tabs)/Tabs";
 import { ScrollInView } from "@/app/_components/ScrollInView";
-import { Controls } from "./_components/Controls";
+import {
+  EditProfileForm,
+  FollowButton,
+  MessageButton,
+  Modal,
+  MoreButton,
+  NotificationButton,
+} from "./_components/Controls";
 import { Avatar } from "@/app/_components/Avatar";
 import { Spacer } from "@/app/_components/Spacer";
 import { followings, users } from "@/server/db/schema";
@@ -14,6 +21,7 @@ import db from "@/server/db";
 import { verifyJWT } from "@/lib/auth";
 import { MainLayout } from "@/app/_layouts/MainLayout";
 import { Aside } from "../../home/layout";
+import { z } from "zod";
 
 export default async function Layout({
   params,
@@ -26,65 +34,86 @@ export default async function Layout({
     payload: { user: me },
   } = await verifyJWT();
 
-  const userProfile = await db.query.users.findFirst({
+  const profile = await db.query.users.findFirst({
     where: eq(users.handle, params.handle),
     columns: {
       password: false,
     },
-    with: {
-      posts: true,
-    },
   });
 
-  if (!userProfile) {
+  if (!profile) {
     return <div>User does not exist</div>;
   }
 
-  const { posts, ...profile } = userProfile;
-  const followers = await db.query.followings.findMany({
-    where: eq(followings.followingId, profile.id),
-  });
+  const banner = faker.image.urlLoremFlickr({ category: "nature" });
 
-  const following = await db.query.followings.findMany({
-    where: eq(followings.followerId, profile.id),
-  });
+  function EditProfileBtn() {
+    return (
+      <Modal
+        trigger={
+          <button className="h-8  rounded-full border border-gray-500 px-4 tracking-wide">
+            Edit profile
+          </button>
+        }
+        content={
+          <EditProfileForm
+            avatar={me.avatar}
+            banner={banner}
+            name={me.displayName}
+          />
+        }
+      />
+    );
+  }
 
-  const isFollowing = await db.query.followings.findFirst({
-    where: and(
-      eq(followings.followingId, profile.id),
-      eq(followings.followerId, me.id),
-    ),
-  });
+  async function VisitorControls({ followingId }: { followingId: string }) {
+    const isFollowing = await db.query.followings.findFirst({
+      where: and(
+        eq(followings.followingId, followingId),
+        eq(followings.followerId, me.id),
+      ),
+    });
+    return (
+      <>
+        <MoreButton size={18} />
+        <NotificationButton size={18} />
+        <MessageButton size={18} />
+        <FollowButton
+          isFollowing={isFollowing ? true : false}
+          followerId={me.id}
+          followingId={followingId}
+        />
+      </>
+    );
+  }
+
+  function Controls({ followingId }: { followingId: string }) {
+    return (
+      <div className="flex justify-end gap-2 py-4 pr-4 text-gray-200">
+        {params.handle === me.handle ? (
+          <EditProfileBtn />
+        ) : (
+          <VisitorControls followingId={followingId} />
+        )}
+      </div>
+    );
+  }
+
   return (
     <MainLayout
       main={
         <>
-          <Header displayName={profile.displayName} numOfPosts={posts.length} />
-          <div className="relative">
-            <Banner src={faker.image.urlLoremFlickr({ category: "nature" })} />
-            <Avatar
-              src={userProfile.avatar ?? ""}
-              className="absolute left-4 h-20 w-20 -translate-y-1/2 overflow-clip rounded-full border-[4px] border-black tablet:h-[140px] tablet:w-[140px]"
-            />
-          </div>
-          <Controls
-            handle={me.handle}
-            followerId={me.id}
-            followingId={userProfile.id}
-            isFollowing={isFollowing ? true : false}
-          />
+          <ScrollInView top={-50} className="sticky z-50">
+            <Header displayName={profile.displayName} userId={profile.id} />
+          </ScrollInView>
+          <Images banner={banner} avatar={profile.avatar} />
+          <Controls followingId={profile.id} />
           <Spacer className="my-1" />
           <Bio user={profile} />
           <Spacer className="my-3" />
           <div className="flex gap-4 px-5 text-sm">
-            <div>
-              {following.length}{" "}
-              <span className="text-sm text-white/50">Following</span>
-            </div>
-            <div>
-              {followers.length}{" "}
-              <span className="text-white/50">Following</span>
-            </div>
+            <Following profileId={profile.id} />
+            <Followers profileId={profile.id} />
           </div>
           <Spacer className="my-8" />
           <Tabs handle={profile.handle} />
@@ -96,34 +125,58 @@ export default async function Layout({
   );
 }
 
-const Header = ({
-  displayName,
-  numOfPosts,
-}: {
-  displayName: string;
-  numOfPosts: number;
-}) => {
-  return (
-    <ScrollInView top={-50} className="sticky z-50">
-      <header
-        className="flex items-center gap-10 bg-black/70 px-6 py-[5px]"
-        style={{ backdropFilter: "blur(10px)" }}
-      >
-        <BackButton>
-          <ArrowLeft size={20} />
-        </BackButton>
-        <div className="flex flex-col">
-          <h2 className="font-bold text-gray-300">{displayName}</h2>
-          <p className="text-sm text-gray-400">{numOfPosts} posts</p>
-        </div>
-
-        {/* <button className="border-gray-500  h-8 border rounded-full px-4 tracking-wide ml-auto font-semibold">
-            Follow
-          </button> */}
-      </header>
-    </ScrollInView>
+async function PostsCount({ userId }: { userId: string }) {
+  const schema = z.object({
+    posts: z.coerce.number(),
+  });
+  const response = await db.execute(
+    sql`SELECT COUNT(*) as posts FROM posts WHERE user_id = ${userId}`,
   );
-};
+  const { posts } = schema.parse(response.rows[0]);
+  return <span>{posts}</span>;
+}
+
+async function Header(props: { displayName: string; userId: string }) {
+  const { displayName, userId } = props;
+  return (
+    <header
+      className="flex items-center gap-10 bg-black/70 px-6 py-[5px]"
+      style={{ backdropFilter: "blur(10px)" }}
+    >
+      <BackButton>
+        <ArrowLeft size={20} />
+      </BackButton>
+      <div className="flex flex-col">
+        <h2 className="font-bold text-gray-300">{displayName}</h2>
+        <div className="flex gap-1.5 text-sm text-gray-400">
+          <Suspense fallback={<span className="opacity-0">199</span>}>
+            <PostsCount userId={userId} />
+          </Suspense>
+          <span>posts</span>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function Images({ banner, avatar }: { banner: string; avatar: string }) {
+  const Banner = ({ src }: { src: string }) => {
+    return (
+      <div className="relative h-[125px] tablet:h-[200px]">
+        <Image src={src} alt="profile banner" fill objectFit="cover" />
+      </div>
+    );
+  };
+  return (
+    <section className="relative">
+      <Banner src={banner} />
+      <Avatar
+        src={avatar}
+        className="absolute left-4 h-20 w-20 -translate-y-1/2 overflow-clip rounded-full border-[4px] border-black tablet:h-[140px] tablet:w-[140px]"
+      />
+    </section>
+  );
+}
 
 const Bio = ({ user }: { user: any }) => {
   return (
@@ -152,14 +205,26 @@ const Bio = ({ user }: { user: any }) => {
   );
 };
 
-const Banner = ({ src }: { src: string }) => {
+async function Following({ profileId }: { profileId: string }) {
+  const following = await db.query.followings.findMany({
+    where: eq(followings.followerId, profileId),
+  });
   return (
-    <div className="relative h-[125px] tablet:h-[200px]">
-      <Image src={src} alt="profile banner" fill objectFit="cover" />
+    <div>
+      {following.length}
+      <span className="text-sm text-white/50">Following</span>
     </div>
   );
-};
+}
 
-const ProfileDetails = async ({ handle }: { handle: string }) => {
-  return <></>;
-};
+async function Followers({ profileId }: { profileId: string }) {
+  const followers = await db.query.followings.findMany({
+    where: eq(followings.followingId, profileId),
+  });
+  return (
+    <div>
+      {followers.length}
+      <span className="text-white/50">Following</span>
+    </div>
+  );
+}

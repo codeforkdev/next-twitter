@@ -1,5 +1,5 @@
 "use server";
-
+import { put } from "@vercel/blob";
 import db from "@/server/db";
 import { pollOptions, polls, posts } from "@/server/db/schema";
 import { nanoid } from "nanoid";
@@ -54,5 +54,23 @@ export async function createGiphyPost({
   giphy,
 }: CreateGiphyPostParams) {
   await db.insert(posts).values({ id: nanoid(), text, userId, giphy });
+  revalidatePath("/");
+}
+
+type CreateImagePostParams = {
+  userId: string;
+  text: string;
+  imageUrl: string;
+};
+
+export async function createImagePost({
+  userId,
+  text,
+  imageUrl,
+}: CreateImagePostParams) {
+  await db
+    .insert(posts)
+    .values({ userId, text, image: imageUrl, id: nanoid() });
+  console.log("submit image post");
   revalidatePath("/");
 }

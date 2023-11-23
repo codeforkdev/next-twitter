@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   FieldArrayWithId,
   UseFormReturn,
@@ -8,28 +8,37 @@ import {
   useForm,
 } from "react-hook-form";
 import { z } from "zod";
-import { createGiphyPost, createPoll } from "../_actions";
+import { createGiphyPost, createImagePost, createPoll } from "../_actions";
 import { UserContext } from "../../UserProvider";
 
-const option = z.object({ value: z.string().trim() });
-const options = option.array().transform(
-  (data) =>
-    data?.filter((o, i) => {
-      if (i < 2 || o.value) return o;
-    }),
-);
+const requiredOption = z.object({
+  value: z.string().trim().min(1, { message: "Required" }),
+});
+
+const options = z
+  .tuple([requiredOption, requiredOption])
+  .rest(z.object({ value: z.string().trim() }));
+// const options = option.array().transform(
+//   (data) =>
+//     data?.filter((o, i) => {
+//       if (i < 2 || o.value) return o;
+//     }),
+// );
 
 const schema = z.object({
   text: z.string().min(1, { message: "Required" }),
   giphy: z.string().nullable(),
-  poll: z.object({
-    options,
-    expiry: z.object({
-      days: z.number(),
-      hours: z.number(),
-      minutes: z.number(),
-    }),
-  }),
+  image: z.any().nullable(),
+  poll: z
+    .object({
+      options,
+      expiry: z.object({
+        days: z.number(),
+        hours: z.number(),
+        minutes: z.number(),
+      }),
+    })
+    .nullable(),
 });
 
 type Schema = z.infer<typeof schema>;
@@ -37,29 +46,11 @@ type Schema = z.infer<typeof schema>;
 type TPostFormContext = {
   form: UseFormReturn<Schema>;
   submit: () => void;
-  appendPollOption: () => void;
   showPoll: boolean;
   togglePoll: () => void;
   audienceSettingsIsVisible: boolean;
   showAudienceSettings: () => void;
   hideAudienceSettings: () => void;
-  pollOptions: FieldArrayWithId<
-    {
-      text: string;
-      poll: {
-        options: {
-          value: string;
-        }[];
-        expiry: {
-          days: number;
-          hours: number;
-          minutes: number;
-        };
-      };
-    },
-    "poll.options",
-    "id"
-  >[];
 };
 
 export const PostFormContext = createContext<TPostFormContext>(
@@ -75,22 +66,22 @@ export default function PostFormProvider({
   const form = useForm<Schema>({
     resolver: zodResolver(schema),
     defaultValues: {
-      poll: {
-        options: [{ value: "" }, { value: "" }],
-        expiry: {
-          days: 1,
-          hours: 0,
-          minutes: 0,
-        },
-      },
+      giphy: null,
+      poll: null,
+      // poll: {
+      //   options: [{ value: "" }, { value: "" }],
+      //   expiry: {
+      //     days: 1,
+      //     hours: 0,
+      //     minutes: 0,
+      //   },
+      // },
     },
   });
 
-  const { fields, append } = useFieldArray({
-    control: form.control,
-    name: "poll.options",
-    keyName: "id",
-  });
+  useEffect(() => {
+    console.log("ERRORS", form.formState.errors);
+  }, [form.formState.errors]);
 
   const [showPoll, setShowPoll] = useState(false);
   const [audienceSettingsIsVisible, setAudienceSettingsIsVisible] =
@@ -102,15 +93,11 @@ export default function PostFormProvider({
     setShowPoll(!showPoll);
   };
 
-  const appendPollOption = () => append({ value: "" });
-
-  const submit = form.handleSubmit((data) => {
+  const submit = form.handleSubmit(async (data) => {
     console.log("form data: ", data);
-    const { text, poll, giphy } = data;
+    const { text, poll, giphy, image } = data;
 
-    console.log(data);
-
-    if (showPoll) {
+    if (poll) {
       if (!poll.options[0].value || !poll.options[1].value) return;
 
       createPoll({
@@ -132,6 +119,22 @@ export default function PostFormProvider({
         giphy,
       });
       form.reset();
+      return;
+    }
+
+    if (image) {
+      console.log(image[0]);
+      console.log("submit image post");
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: image[0],
+      });
+      const data = await response.json();
+
+      if (data.ok) {
+        console.log("create post");
+        createImagePost({ userId: user.id, text, imageUrl: data.blob.url });
+      }
     }
   });
 
@@ -141,11 +144,9 @@ export default function PostFormProvider({
         form,
         showPoll,
         togglePoll,
-        appendPollOption,
         showAudienceSettings,
         hideAudienceSettings,
         audienceSettingsIsVisible,
-        pollOptions: fields,
         submit,
       }}
     >

@@ -1,12 +1,8 @@
-"use client";
 import { Avatar } from "@/app/_components/Avatar";
 import { Spacer } from "@/app/_components/Spacer";
 import { Share } from "lucide-react";
 import { TPostSchema } from "@/schemas";
-import { useContext, useState } from "react";
-import { UserContext } from "@/app/(main)/UserProvider";
-import usePartySocket from "partysocket/react";
-import { z } from "zod";
+import { Suspense, useContext, useState } from "react";
 import {
   BookmarkButton,
   CommentsButton,
@@ -15,9 +11,12 @@ import {
   ReactionsProvider,
   RepostButton,
 } from "@/app/_components/Post/Reactions";
-import { PathParamsContext } from "next/dist/shared/lib/hooks-client-context.shared-runtime";
+import Poll from "@/app/_components/Post/Poll";
+import Loading from "@/app/(main)/home/loading";
+import Image from "next/image";
+import Views from "./Views";
 
-export default function ParentPost(props: TPostSchema) {
+export default function ParentPost(props: TPostSchema & { userId: string }) {
   return (
     <div className="p-4 pb-0">
       <ReactionsProvider
@@ -37,6 +36,35 @@ export default function ParentPost(props: TPostSchema) {
         <div>
           <p>{props.text}</p>
         </div>
+
+        {props.giphy && (
+          <div className="relative h-96 w-full overflow-clip rounded-lg border border-neutral-700">
+            <Image
+              src={props.giphy}
+              alt=""
+              fill
+              style={{ aspectRatio: "1/1" }}
+            />
+          </div>
+        )}
+
+        {props.image && (
+          <div className="relative h-96 w-full overflow-clip rounded-lg border border-neutral-700">
+            <Image
+              src={props.image}
+              alt=""
+              fill
+              objectFit="contain"
+              style={{ aspectRatio: "1/1" }}
+            />
+          </div>
+        )}
+
+        {props.pollId && (
+          <Suspense fallback={<Loading />}>
+            <Poll id={props.pollId} userId={props.userId} />
+          </Suspense>
+        )}
 
         <Spacer className="my-4" />
         <div className="flex gap-2 text-sm text-white/50">
@@ -80,8 +108,3 @@ export default function ParentPost(props: TPostSchema) {
     </div>
   );
 }
-
-const Views = () => {
-  const { views } = useContext(ReactionsContext);
-  return <span>{views} views</span>;
-};

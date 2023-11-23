@@ -24,6 +24,7 @@ type Props = {
   pollId: string | null;
   userId: string;
   giphy: string | null;
+  image: string | null;
   metrics: {
     likes: number;
     comments: number;
@@ -76,7 +77,7 @@ export function PostHeader(props: {
 }
 
 export default function Post(props: Props) {
-  const { metrics, viewer, author, id, text, userId, giphy } = props;
+  const { metrics, viewer, author, id, text, userId, giphy, image } = props;
 
   return (
     <PostLink handle={author.handle} id={id}>
@@ -95,6 +96,19 @@ export default function Post(props: Props) {
           {giphy && (
             <div className="relative h-96 w-full overflow-clip rounded-lg border border-neutral-700">
               <Image src={giphy} alt="" fill style={{ aspectRatio: "1/1" }} />
+            </div>
+          )}
+
+          {image && (
+            <div className="relative h-96 w-full overflow-clip rounded-lg border border-neutral-700">
+              <Image
+                src={image}
+                alt=""
+                fill
+                objectFit="contain"
+                style={{}}
+                className="w-fit max-w-full"
+              />
             </div>
           )}
 

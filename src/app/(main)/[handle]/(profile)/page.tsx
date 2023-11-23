@@ -23,5 +23,5 @@ export default async function Page({ params }: { params: { handle: string } }) {
     postIds: idSchema.array().parse(postIds.rows),
   });
 
-  return <PostsList posts={posts} />;
+  return <PostsList userId={user.id} posts={posts} />;
 }

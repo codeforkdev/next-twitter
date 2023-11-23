@@ -110,6 +110,7 @@ export const posts = mysqlTable("posts", {
   text: varchar("text", { length: 500 }).notNull(),
   pollId: varchar("poll_id", { length: 21 }),
   giphy: varchar("giphy", { length: 500 }),
+  image: varchar("image", { length: 500 }),
   createdAt,
 });
 
