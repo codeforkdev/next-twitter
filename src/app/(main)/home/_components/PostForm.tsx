@@ -307,11 +307,11 @@ const Options = () => {
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="flex items-center gap-1 px-1 text-primary"
+      className={cn("flex items-center gap-1 px-1 text-primary")}
     >
       <label
         htmlFor="image"
-        className=" flex h-8 w-8 items-center justify-center"
+        className={cn(" flex h-8 w-8 items-center justify-center")}
       >
         {/* <Option disabled={form.watch("giphy") || showPoll ? true : false}> */}
         <ImageIcon size={21} />

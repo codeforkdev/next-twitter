@@ -18,8 +18,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full">
-      <body className={cn(inter.className, "h-full")}>{children}</body>
+    <html lang="en" className="" style={{ height: "dvh" }}>
+      <body className={cn(inter.className, "")} style={{ height: "dvh" }}>
+        {children}
+      </body>
     </html>
   );
 }
