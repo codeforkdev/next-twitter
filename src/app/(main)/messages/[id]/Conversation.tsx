@@ -22,7 +22,7 @@ export default function Conversation(props: Props) {
   usePartySocket({
     room: props.id,
     host: PKURL,
-    party: "chat",
+    party: "message",
 
     onMessage: (evt: MessageEvent) => {
       console.log(evt);

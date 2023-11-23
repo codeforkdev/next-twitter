@@ -5,6 +5,7 @@
   "parties": {
     "post": "src/server/party/post.ts",
     "chat": "src/server/party/chat.ts",
+    "message": "src/server/party/message.ts",
     "poll": "src/server/party/poll.ts"
   }
 }

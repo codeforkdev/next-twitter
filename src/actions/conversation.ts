@@ -53,5 +53,5 @@ export const createMessage = async (params: CreateMessageProps) => {
   const message = messageSchema.parse(messagesResponse.rows[0]);
 
   if (!message) return;
-  broadcast({ party: "chat", roomId: conversationId, data: message });
+  broadcast({ party: "message", roomId: conversationId, data: message });
 };
