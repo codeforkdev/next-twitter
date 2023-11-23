@@ -101,9 +101,7 @@ interface InputProps extends React.ComponentPropsWithoutRef<"input"> {
   placeholderStyles?: string;
 }
 
-type Ref = HTMLInputElement;
-
-export const Input = forwardRef<Ref, InputProps>((props, ref) => {
+export function Input(props: InputProps) {
   const [focused, setFocused] = useState<"focused" | "unfocused">("unfocused");
   return (
     <motion.div
@@ -122,7 +120,6 @@ export const Input = forwardRef<Ref, InputProps>((props, ref) => {
       className={cn("relative w-full border", props.containerStyles)}
     >
       <motion.input
-        ref={ref}
         onFocus={(e) => {
           setFocused("focused");
           props.onFocus && props.onFocus(e);
@@ -175,7 +172,7 @@ export const Input = forwardRef<Ref, InputProps>((props, ref) => {
       </motion.p>
     </motion.div>
   );
-});
+}
 
 function Loading({
   className,

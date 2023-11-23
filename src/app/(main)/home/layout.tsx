@@ -8,7 +8,7 @@ import { MainLayout } from "@/app/_layouts/MainLayout";
 import SearchUsers from "./SearchUsers";
 import { Spacer } from "@/app/_components/Spacer";
 import { SettingsIcon } from "lucide-react";
-import Post, { PostForm } from "./_components/PostForm";
+import Post from "./_components/PostForm";
 
 export default async function Layout({
   children,
@@ -105,7 +105,7 @@ export function Aside() {
         </div>
 
         <div className="w-full rounded-xl bg-[#16181c] p-4">
-          <p className="mb-2 text-xl font-bold">What's happening</p>
+          <p className="mb-2 text-xl font-bold">What&apos;s happening</p>
           <p className="mb-3 text-sm font-semibold">
             Subscribe to unlock new features and if eligible, receive a share of
             ads revenue.
