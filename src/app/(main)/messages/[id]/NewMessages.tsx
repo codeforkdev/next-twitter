@@ -31,7 +31,12 @@ export default function NewMessages({
     <>
       {messages.map((msg) => (
         <li key={msg.id} className="border border-red-500">
-          <Message participant={msg.participant} userId={userId}>
+          <Message
+            participant={msg.participant}
+            userId={userId}
+            id={msg.id}
+            createdAt={msg.createdAt}
+          >
             {msg.text}
           </Message>
         </li>
