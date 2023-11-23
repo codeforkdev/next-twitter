@@ -14,10 +14,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-} // modal,
-: {
+}: {
   children: React.ReactNode;
-  // modal: React.ReactNode;
 }) {
   return (
     <html lang="en" className="h-full">
@@ -26,6 +24,6 @@ export default function RootLayout({
   );
 }
 
-function Modal({ children }: { children: React.ReactNode }) {
-  return <div className="z-[9999]">{children}</div>;
-}
+// function Modal({ children }: { children: React.ReactNode }) {
+//   return <div className="z-[9999]">{children}</div>;
+// }
