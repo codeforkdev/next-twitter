@@ -1,6 +1,6 @@
 "use client";
+import { login } from "@/actions/auth";
 import { Avatar } from "@/app/_components/Avatar";
-import { login } from "@/app/actions/auth";
 import { users } from "@/server/db/schema";
 import * as Dialog from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
@@ -21,12 +21,14 @@ export default function PickUser({
           <XIcon size={20} />
         </Link>
         <Avatar src="/logo.svg" className="mx-auto h-7 w-7 rounded-none" />
-        <div />
       </header>
 
       <div className="p-4 text-3xl  font-semibold">Choose a demo user</div>
       {userList.map((user) => (
-        <li className="flex gap-4 px-6 py-4 transition-all hover:bg-white/10">
+        <li
+          key={user.id}
+          className="flex gap-4 px-6 py-4 transition-all hover:bg-white/10"
+        >
           <Avatar src={user.avatar} className="h-12 w-12" />
           <div className="">
             <p>{user.displayName}</p>

@@ -143,7 +143,12 @@ interface InputProps extends React.ComponentPropsWithoutRef<"input"> {
   label: string;
   length: number;
 }
-const NumberDropDown = forwardRef<Ref, InputProps>((props, ref) => {
+function NumberDropDown(props: {
+  label: string;
+  length: number;
+  onChange: (val: number) => void;
+}) {
+  const { label, onChange, length } = props;
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(0);
   return (
@@ -162,7 +167,7 @@ const NumberDropDown = forwardRef<Ref, InputProps>((props, ref) => {
               "text-primary": open,
             })}
           >
-            {props.label}
+            {label}
           </p>
           <p className="text-left">1</p>
         </div>
@@ -174,9 +179,8 @@ const NumberDropDown = forwardRef<Ref, InputProps>((props, ref) => {
           <input
             type="number"
             value={value}
-            onChange={() => props.onSelected(value)}
+            onChange={() => onChange(value)}
             hidden
-            ref={ref}
           />
           {new Array(length).fill(null).map((_, i) => (
             <Dropdown.DropdownMenuItem
@@ -191,7 +195,7 @@ const NumberDropDown = forwardRef<Ref, InputProps>((props, ref) => {
       </Dropdown.Portal>
     </Dropdown.Root>
   );
-});
+}
 
 const Poll = () => {
   const {
@@ -208,7 +212,7 @@ const Poll = () => {
     prepend({ value: "" });
 
     return () => setValue("poll", null);
-  }, []);
+  }, [prepend]);
   const appendPollOption = () => append({ value: "" });
 
   return (
@@ -256,8 +260,7 @@ const Poll = () => {
               name="poll.expiry.days"
               render={({ field, fieldState, formState }) => (
                 <NumberDropDown
-                  onSelected={field.onChange}
-                  ref={field.ref}
+                  onChange={field.onChange}
                   label={"Days"}
                   length={6}
                 />
@@ -268,8 +271,7 @@ const Poll = () => {
               name="poll.expiry.hours"
               render={({ field, fieldState, formState }) => (
                 <NumberDropDown
-                  ref={field.ref}
-                  onSelected={field.onChange}
+                  onChange={field.onChange}
                   label={"Hours"}
                   length={23}
                 />
@@ -280,8 +282,7 @@ const Poll = () => {
               name="poll.expiry.minutes"
               render={({ field, fieldState, formState }) => (
                 <NumberDropDown
-                  ref={field.ref}
-                  onSelected={field.onChange}
+                  onChange={field.onChange}
                   label={"Minutes"}
                   length={59}
                 />

@@ -46,7 +46,7 @@ export default async function Page({ params }: { params: { id: string } }) {
             {participants.map((p, i) => {
               if (p.id === user.id) return;
               return (
-                <li>
+                <li key={p.id}>
                   {p.displayName}
                   {i < participants.length - 1 &&
                     participants.length !== 2 &&

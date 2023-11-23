@@ -124,7 +124,7 @@ const Participants = ({ participants }: { participants: TParticipant[] }) => {
     <ul className="flex flex-1 gap-2">
       {participants.map((p, i) => {
         return (
-          <li>
+          <li key={p.id}>
             {p.displayName}
             {i < participants.length - 1 && ", "}
           </li>

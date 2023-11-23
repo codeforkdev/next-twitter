@@ -1,7 +1,4 @@
 "use client";
-// import { trpc } from "@/app/api/trpc/[trpc]/trpc";
-import PickUser from "./_components/PickUser";
-// import { api } from "@/trpc/server";
 import Link from "next/link";
 import { XIcon } from "lucide-react";
 import { Avatar } from "@/app/_components/Avatar";
@@ -46,7 +43,7 @@ export default function Page() {
 
             <Spacer className="py-2" />
             <p>
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/signup" className="text-primary">
                 Sign up
               </Link>

@@ -14,7 +14,7 @@ export default function Messages({
   return (
     <ul>
       {messages.map((msg) => (
-        <li>{newMessage(msg)}</li>
+        <li key={msg.id}>{newMessage(msg)}</li>
       ))}
     </ul>
   );
