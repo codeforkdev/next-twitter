@@ -32,11 +32,11 @@ const schema = z.object({
   poll: z
     .object({
       options,
-      expiry: z.object({
-        days: z.number(),
-        hours: z.number(),
-        minutes: z.number(),
-      }),
+      // expiry: z.object({
+      //   days: z.number(),
+      //   hours: z.number(),
+      //   minutes: z.number(),
+      // }),
     })
     .nullable(),
 });
@@ -104,7 +104,7 @@ export default function PostFormProvider({
         userId: user.id,
         text,
         options: poll.options.map((o) => o.value),
-        expiry: poll.expiry,
+        expiry: { days: 1, hours: 1, minutes: 1 },
       });
       togglePoll();
       form.reset();

@@ -253,7 +253,7 @@ const Poll = () => {
               Add option
             </button>
           )}
-          <div className="flex gap-6">
+          {/* <div className="flex gap-6">
             <Controller
               control={control}
               name="poll.expiry.days"
@@ -287,7 +287,7 @@ const Poll = () => {
                 />
               )}
             />
-          </div>
+          </div> */}
         </div>
       </div>
 
