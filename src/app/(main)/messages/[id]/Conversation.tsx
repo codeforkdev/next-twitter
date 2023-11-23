@@ -14,7 +14,6 @@ type Props = {
   messages: TMessage[];
 };
 export default function Conversation(props: Props) {
-  const [isFetching, setIsFetching] = useState(false);
   const container = useRef<HTMLDivElement>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const top = useRef<HTMLDivElement>(null);
@@ -30,11 +29,6 @@ export default function Conversation(props: Props) {
       setMessages((prev) => [...prev, msg]);
     },
   });
-
-  // p.send(
-  //   JSON.stringify({ type: "user", userId: props.userId, isTyping: false }),
-  // );
-  useEffect(() => {}, []);
 
   const getOlderMessages = async () => {
     console.log("first message: ", messages[0]);
