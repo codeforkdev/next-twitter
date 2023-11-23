@@ -79,7 +79,7 @@ export async function GET(request: Request) {
 
   faker.seed(1);
 
-  await clearTables();
+  // await clearTables();
   let users = await seedUsers();
   let posts = await seedPosts(users);
 
