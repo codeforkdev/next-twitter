@@ -25,6 +25,8 @@ export const createConversation = async (userIds: string[]) => {
       })),
     );
   });
+  revalidatePath("/");
+  redirect("/messages/" + conversationId);
 };
 
 // export const createConversation = async (userId: string, userIds: string[]) => {
