@@ -56,7 +56,7 @@ export const PostForm = () => {
         {form.watch("giphy") && (
           <div className="relative h-96 w-full overflow-clip rounded-lg">
             <Image
-              src={form.getValues("giphy")}
+              src={form.getValues("giphy")!}
               alt=""
               fill
               style={{ aspectRatio: "1/1" }}
@@ -236,7 +236,6 @@ const Poll = () => {
                     placeholderStyles="text-neutral-400"
                     error={false}
                     name={name}
-                    ref={ref}
                     placeholder={`Option ${index + 1} ${
                       index > 1 ? "(optional)" : ""
                     }`}
