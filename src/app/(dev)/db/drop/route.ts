@@ -1,5 +1,5 @@
-import { db } from "@/drizzle/db";
-import * as schema from "@/drizzle/schema";
+import db from "@/server/db";
+import * as schema from "@/server/db/schema";
 
 async function clearTables() {
   try {
