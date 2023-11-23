@@ -1,6 +1,7 @@
 "use client";
 import { createMessage } from "@/actions/conversation";
 import { Avatar } from "@/app/_components/Avatar";
+import { PKURL } from "@/app/_components/Post/constants";
 import { ImagePlusIcon, Send } from "lucide-react";
 import usePartySocket from "partysocket/react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
@@ -21,7 +22,7 @@ export default function ChatInput({
 
   const ws = usePartySocket({
     room: "chat",
-    host: "http://localhost:1999",
+    host: PKURL,
     party: "chat",
     query: {
       user: avatar,

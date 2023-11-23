@@ -1,5 +1,6 @@
 "use client";
 
+import { PKURL } from "@/app/_components/Post/constants";
 import { faker } from "@faker-js/faker";
 import usePartySocket from "partysocket/react";
 import React, { useRef, useState } from "react";
@@ -16,7 +17,7 @@ const ChatInput = () => {
 
   const ws = usePartySocket({
     room: "chat",
-    host: "http://localhost:1999",
+    host: PKURL,
     party: "chat",
     query: {
       user: user,

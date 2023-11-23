@@ -11,6 +11,7 @@ import { eq, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { broadcast } from "./posts";
 
 export const createConversation = async (userIds: string[]) => {
   const conversationId = nanoid();
@@ -101,9 +102,5 @@ export const createMessage = async (params: CreateMessageProps) => {
   const message = messageSchema.parse(messagesResponse.rows[0]);
 
   if (!message) return;
-
-  fetch(`http://localhost:1999/parties/main/${conversationId}`, {
-    method: "POST",
-    body: JSON.stringify(message),
-  });
+  broadcast({ party: "main", roomId: conversationId, data: message });
 };

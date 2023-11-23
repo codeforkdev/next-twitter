@@ -6,6 +6,7 @@ import { Message } from "./Message";
 import usePartySocket from "partysocket/react";
 import { TMessage, messageSchema } from "@/schemas";
 import { getMessagesByDate } from "@/actions/chat";
+import { PKURL } from "@/app/_components/Post/constants";
 
 type Props = {
   id: string;
@@ -21,7 +22,7 @@ export default function Conversation(props: Props) {
 
   const p = usePartySocket({
     room: props.id,
-    host: "http://localhost:1999",
+    host: PKURL,
 
     onMessage: (evt: MessageEvent) => {
       const msg = messageSchema.parse(JSON.parse(evt.data));

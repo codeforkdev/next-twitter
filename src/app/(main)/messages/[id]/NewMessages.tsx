@@ -6,6 +6,7 @@ import {
 import usePartySocket from "partysocket/react";
 import React, { useState } from "react";
 import { Message } from "./Message";
+import { PKURL } from "@/app/_components/Post/constants";
 
 type TMessage = typeof conversationMessages.$inferSelect & {
   participant: typeof conversationParticipants.$inferSelect;
@@ -21,7 +22,7 @@ export default function NewMessages({
 
   usePartySocket({
     room: conversationId,
-    host: "http://localhost:1999",
+    host: PKURL,
     onMessage: (evt: MessageEvent) => {
       setMessages((prev) => [...prev, JSON.parse(evt.data)]);
     },

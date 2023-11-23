@@ -3,6 +3,7 @@
 import { CheckCircleIcon } from "lucide-react";
 import usePartySocket from "partysocket/react";
 import { useState } from "react";
+import { PKURL } from "./constants";
 
 type Option = {
   id: string;
@@ -27,7 +28,7 @@ export default function PostMetrics(props: Props) {
   const [options, setOptions] = useState(props.options);
   const [votes, setVotes] = useState(props.votes);
   const ws = usePartySocket({
-    host: "http://localhost:1999",
+    host: PKURL,
     party: "poll",
     room: props.pollId,
     onMessage: (evt) => {
