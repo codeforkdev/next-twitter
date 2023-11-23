@@ -151,6 +151,7 @@ const Content = ({ close }: { close: () => void }) => {
         <div className="relative grid w-full grid-cols-2 ">
           {categories.map((c) => (
             <button
+              key={c.src}
               onClick={async () => {
                 setSearch(c.title);
                 const res = await gf.search(c.title, { limit: 21 });
@@ -182,6 +183,7 @@ const Content = ({ close }: { close: () => void }) => {
         <div className=" grid max-h-[500px] grid-cols-3 overflow-y-auto">
           {results.map((image) => (
             <button
+              key={image.url}
               onClick={() => {
                 console.log("selected an gif", image.url);
                 form.setValue("giphy", image.url);
