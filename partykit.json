@@ -6,6 +6,8 @@
     "post": "src/server/party/post.ts",
     "chat": "src/server/party/chat.ts",
     "message": "src/server/party/message.ts",
-    "poll": "src/server/party/poll.ts"
+    "poll": "src/server/party/poll.ts",
+    "livestate": "src/server/party/livestate.ts",
+    "chatprovider": "src/server/party/chatprovider.ts"
   }
 }

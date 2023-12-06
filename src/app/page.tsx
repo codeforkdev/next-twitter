@@ -3,35 +3,35 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
+export function Logo() {
+  return (
+    <div className="relative h-8 w-8 laptop:h-80 laptop:w-80">
+      <Image src={"/logo.svg"} alt="" fill />
+    </div>
+  );
+}
+
 export default async function Page() {
   return (
     <div className="flex h-full flex-col justify-center ">
-      <div className="mx-auto flex w-full max-w-7xl flex-1 shrink-0 items-center justify-between">
-        <section className="relative h-80 w-80">
-          <Image src={"/logo.svg"} alt="" fill />
-        </section>
+      <div className="flex w-full max-w-7xl flex-1 shrink-0 items-center justify-center px-8 md:px-0 laptop:mx-auto laptop:gap-60">
+        <div className="fixed left-12 top-12 laptop:relative">
+          <Logo />
+        </div>
         <section>
-          <h1 className="text-7xl font-bold">Happening now</h1>
+          <h1 className="text-4xl font-bold tablet:text-7xl">Happening now</h1>
           <Spacer className="my-12" />
           <div className="max-w-[288px]">
             <p className="text-3xl font-bold">Join today.</p>
-            <Spacer className="my-10" />
+            <Spacer className="my-6" />
             <div className="flex flex-col gap-3">
-              <button className="w-full rounded-full  bg-gray-200 py-2 text-black">
-                Sign in
-              </button>
-              <button className="w-full rounded-full  bg-gray-200 py-2 text-black">
-                Sign in
-              </button>
-              <div className="flex items-center gap-2">
-                <div className="h-[1px] flex-1 bg-white/30" />
-                <p>or</p>
-                <div className="h-[1px] flex-1 bg-white/30" />
-              </div>
               <form>
-                <button className="w-full rounded-full  bg-primary py-2 text-sm font-semibold text-white">
+                <Link
+                  className="block w-full  rounded-full bg-primary py-2 text-center text-sm font-semibold text-white"
+                  href="/signup"
+                >
                   Create Account
-                </button>
+                </Link>
               </form>
 
               <p className="text-xs">
@@ -50,17 +50,12 @@ export default async function Page() {
               >
                 Sign in
               </Link>
-              {/* <Link
-                href="/home"
-                className="w-full rounded-full border border-white/20 py-2 text-center text-primary"
-              >
-                Sign in
-              </Link> */}
             </div>
           </div>
         </section>
       </div>
-      <footer className="pb-4">
+
+      <footer className="hidden pb-4">
         <ul className="mx-auto flex max-w-[1600px] gap-4 text-xs text-neutral-400">
           <FooterLink href="https://about.twitter.com/en" text="About" />
           <FooterLink

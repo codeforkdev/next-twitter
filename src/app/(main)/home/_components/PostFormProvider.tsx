@@ -18,12 +18,6 @@ const requiredOption = z.object({
 const options = z
   .tuple([requiredOption, requiredOption])
   .rest(z.object({ value: z.string().trim() }));
-// const options = option.array().transform(
-//   (data) =>
-//     data?.filter((o, i) => {
-//       if (i < 2 || o.value) return o;
-//     }),
-// );
 
 const schema = z.object({
   text: z.string().min(1, { message: "Required" }),

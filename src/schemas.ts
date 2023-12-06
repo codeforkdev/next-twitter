@@ -35,6 +35,7 @@ export const messageSchema = z.object({
   handle: z.string(),
   avatar: z.string(),
   displayName: z.string(),
+  participantId: z.string(),
 });
 
 export type TMessage = z.infer<typeof messageSchema>;

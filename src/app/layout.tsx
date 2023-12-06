@@ -3,6 +3,9 @@ import "@/styles/globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import React from "react";
+import { LiveStateClient } from "./LiveClient";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,14 +15,16 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/logo.svg" }],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className={cn(inter.className, " h-full")}>{children}</body>
+      <body className={cn(GeistMono.className, " h-full")}>
+        <LiveStateClient>{children}</LiveStateClient>
+      </body>
     </html>
   );
 }

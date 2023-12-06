@@ -1,5 +1,5 @@
 "use client";
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect } from "react";
 import { Spacer } from "@/app/_components/Spacer";
 import { motion } from "framer-motion";
 import { FormEvent, useState } from "react";
@@ -7,6 +7,9 @@ import * as RToast from "@radix-ui/react-toast";
 import { cn } from "@/lib/utils";
 import { login } from "../_actions";
 import { useRouter } from "next/navigation";
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type Result<T> = { success: true; data: T } | { success: false; error: string };
 type AsyncFunction = (...args: any) => Promise<any>;
@@ -31,16 +34,31 @@ function useAction<T extends AsyncFunction>(action: T) {
   return { execute, isLoading, error };
 }
 
+const schema = z.object({
+  name: z.string().trim().min(1, { message: "Required" }),
+  password: z.string().trim().min(1, { message: "Required" }),
+});
+
+type Schema = z.infer<typeof schema>;
+
 export default function CredentialAuth() {
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
+  const {
+    handleSubmit,
+    control,
+    formState: { errors, isSubmitting },
+  } = useForm<Schema>({ resolver: zodResolver(schema) });
   const [toast, setToast] = useState<React.ReactNode | null>();
   const [showToast, setShowToast] = useState(false);
   const router = useRouter();
-  const { execute, isLoading, error } = useAction(login);
 
-  const handleLogin = async () => {
-    const response = await execute({ name, password });
+  const handleLogin = async ({
+    name,
+    password,
+  }: {
+    name: string;
+    password: string;
+  }) => {
+    const response = await login({ name, password });
     if (response.success) {
       response.data;
       router.push("/home");
@@ -63,34 +81,64 @@ export default function CredentialAuth() {
     setShowToast(true);
   };
 
+  useEffect(() => {
+    console.log(errors);
+  }, [errors]);
+
   return (
-    <>
-      <Input
-        error={error ? true : false}
-        onInput={(e) => setName(e.currentTarget.value)}
-        placeholder="Email or Handle"
+    <form
+      onSubmit={handleSubmit(({ name, password }) => {
+        handleLogin({ name, password });
+      })}
+    >
+      <Controller
+        control={control}
+        name="name"
+        render={({
+          field: { onChange, value, ref },
+          fieldState: { error },
+        }) => (
+          <Input
+            error={error ? true : false}
+            value={value}
+            onChange={onChange}
+            placeholder="Email or Handle"
+          />
+        )}
       />
+
       <Spacer className="py-2" />
-      <Input
-        error={error ? true : false}
-        onInput={(e) => setPassword(e.currentTarget.value)}
-        placeholder="Password"
+      <Controller
+        control={control}
+        name="password"
+        render={({
+          field: { onChange, value, ref },
+          fieldState: { error },
+        }) => (
+          <Input
+            error={error ? true : false}
+            value={value}
+            onChange={onChange}
+            placeholder="Password"
+          />
+        )}
       />
+
       <Spacer className="my-6" />
       <button
-        onClick={handleLogin}
+        type="submit"
         className="relative w-full rounded-full bg-gray-200 py-2 text-black transition-colors hover:bg-gray-200/90"
       >
         <span className="font-semibold">Login</span>
 
         <span className="absolute top-1/2 ml-2 -translate-y-1/2">
-          <Loading loading={isLoading} />
+          <Loading loading={isSubmitting} />
         </span>
       </button>
       <RToast.Root onOpenChange={setShowToast} open={showToast}>
         {toast}
       </RToast.Root>
-    </>
+    </form>
   );
 }
 
@@ -99,10 +147,13 @@ interface InputProps extends React.ComponentPropsWithoutRef<"input"> {
   inputStyles?: string;
   containerStyles?: string;
   placeholderStyles?: string;
+  // onEnter: () => void;
 }
 
 export function Input(props: InputProps) {
-  const [focused, setFocused] = useState<"focused" | "unfocused">("unfocused");
+  const [focused, setFocused] = useState<"focused" | "unfocused">(
+    props.autoFocus ? "focused" : "unfocused",
+  );
   return (
     <motion.div
       animate={focused}
@@ -120,6 +171,10 @@ export function Input(props: InputProps) {
       className={cn("relative w-full border", props.containerStyles)}
     >
       <motion.input
+        // autoFocus={props.autoFocus}
+        onKeyDown={(e) => {
+          props.onKeyDown && props.onKeyDown(e);
+        }}
         onFocus={(e) => {
           setFocused("focused");
           props.onFocus && props.onFocus(e);

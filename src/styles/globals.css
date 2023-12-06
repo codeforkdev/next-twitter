@@ -5,6 +5,7 @@
 html,
 body {
   @apply bg-black text-white;
+  /* @apply  text-black; */
 }
 
 html {
