@@ -1,14 +1,14 @@
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import db from "@/server/db";
-import { verifyJWT } from "@/lib/auth";
 import { getPosts } from "@/server/db/queries";
 import { idSchema } from "@/schemas";
 import PostsList from "@/app/_components/Post/PostsList";
 import { ensureError } from "@/types";
+import { redirect } from "next/navigation";
+import { getUser } from "@/actions/auth";
 export default async function Page() {
-  const {
-    payload: { user },
-  } = await verifyJWT();
+  const user = await getUser();
+  if (!user) redirect("/");
 
   try {
     const query = sql`SELECT id FROM posts WHERE parent_id IS NULL`;

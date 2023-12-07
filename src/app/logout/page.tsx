@@ -1,13 +1,12 @@
-import { logout } from "@/actions/auth";
+import { getUser, logout } from "@/actions/auth";
 import BackButton from "@/app/_components/BackButton";
 import { Spacer } from "@/app/_components/Spacer";
-import getSession from "@/lib/session";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
-  const session = await getSession();
-  if (!session) redirect("/");
+  const user = await getUser();
+  if (!user) redirect("/");
   return (
     <div className="flex h-full w-full items-center justify-center  bg-gray-600/50">
       <form action={logout} className="w-full max-w-xs rounded-xl bg-black p-8">

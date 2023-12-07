@@ -1,12 +1,12 @@
 import { Spacer } from "@/app/_components/Spacer";
 import NewConversationModal from "./_components/NewConversationModal";
-import { verifyJWT } from "@/lib/auth";
 import ConversationListContainer from "./_components/ConversationListContainer";
+import { getUser } from "@/actions/auth";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
-  const {
-    payload: { user },
-  } = await verifyJWT();
+  const user = await getUser();
+  if (!user) redirect("/");
   return (
     <div className={"h-full flex-col items-center justify-center laptop:flex"}>
       <div className="max-w-sm gap-2">

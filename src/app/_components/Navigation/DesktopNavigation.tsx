@@ -1,23 +1,17 @@
 "use client";
 import { cn } from "@/lib/utils";
 import {
-  Bell,
   BellIcon,
-  Bookmark,
   BookmarkIcon,
   Feather,
-  GanttChartSquare,
   GanttChartSquareIcon,
-  Home,
   HomeIcon,
   LucideIcon,
   Mail,
   MoreHorizontal,
   MoreHorizontalIcon,
-  Search,
   SearchIcon,
   UserIcon,
-  Users2,
   Users2Icon,
 } from "lucide-react";
 import Image from "next/image";
@@ -84,7 +78,7 @@ const NavLink = (props: {
       <a href={props.url} className={cls}>
         <div
           className={cn(
-            "flex h-[50px] w-fit items-center gap-[10px] rounded-full bg-none pl-1 transition-colors desktop:pr-8 desktop:group-hover:bg-white/10",
+            "flex h-[50px] w-fit items-center gap-[10px] rounded-full bg-none pl-4 transition-colors desktop:pr-8 desktop:group-hover:bg-white/10",
           )}
         >
           {props.icon}

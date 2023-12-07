@@ -1,13 +1,10 @@
 import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import React from "react";
 import { LiveStateClient } from "./LiveClient";
 import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
-
-const inter = Inter({ subsets: ["latin"] });
+import * as Toast from "./(auth)/Toast";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,8 +19,10 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className={cn(GeistMono.className, " h-full")}>
-        <LiveStateClient>{children}</LiveStateClient>
+      <body className={cn(GeistSans.className, " h-full")}>
+        <Toast.Provider swipeDirection="down">
+          <LiveStateClient>{children}</LiveStateClient>
+        </Toast.Provider>
       </body>
     </html>
   );

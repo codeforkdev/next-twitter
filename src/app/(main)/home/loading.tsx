@@ -1,7 +1,19 @@
-export default function Loading() {
+import { cn } from "@/lib/utils";
+
+export default function Loading({
+  show,
+  size,
+}: {
+  show: boolean;
+  size: string;
+}) {
   return (
-    <div className="flex justify-center pt-20">
-      <div className=" h-20 w-20 animate-spin rounded-full border-8 border-gray-300/50 border-t-primary" />
-    </div>
+    <div
+      className={cn(
+        "   animate-spin rounded-full border-4 border-gray-300/50 border-t-primary",
+        { "opacity-0": !show },
+        size,
+      )}
+    />
   );
 }

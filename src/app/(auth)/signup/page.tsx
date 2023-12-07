@@ -1,215 +1,181 @@
 "use client";
-
 import { z } from "zod";
 import { Input } from "../login/_components/CredentialAuth";
 import {
   Controller,
   FormProvider,
+  useController,
   useForm,
   useFormContext,
+  useWatch,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Avatar } from "@/app/_components/Avatar";
-import { faker } from "@faker-js/faker";
-import Image from "next/image";
 import { Spacer } from "@/app/_components/Spacer";
 import { cn } from "@/lib/utils";
-import React, { createContext, useState } from "react";
-import { ArrowLeftIcon } from "lucide-react";
+import React, { createContext, useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import Loading from "@/app/(main)/home/loading";
+import { register } from "module";
+import { signUp } from "@/actions/auth";
 
-const schema = z.object({
-  displayname: z.string().trim().min(1, { message: "required" }),
-  handle: z.string().trim().min(1, { message: "Required" }),
-});
-
-function StepsIndicator({ length, step }: { length: number; step: number }) {
-  return (
-    <div className="flex gap-4">
-      {new Array(length).fill(null).map((_, i) => {
-        const active = i + 1 === step;
-        return (
-          <div
-            className={cn("h-[5px] flex-1 rounded-full ", {
-              "animate-pulse bg-primary": active,
-              "bg-primary/60": !active,
-              "bg-primary": i + 1 < step,
-            })}
-          />
-        );
-      })}
-    </div>
-  );
-}
+const schema = z
+  .object({
+    handle: z.string().trim().min(1, { message: "Required" }),
+    email: z.string().email({ message: "Required" }),
+    password: z.string().trim().min(1, { message: "Required" }),
+    confirmPassword: z.string().trim().min(1, { message: "Required" }),
+  })
+  .superRefine(({ password, confirmPassword }, ctx) => {
+    if (password !== confirmPassword) {
+      ctx.addIssue({ code: "custom", message: "Password does not match" });
+    }
+  });
 
 type Schema = z.infer<typeof schema>;
 
-const StepContext = createContext({
-  currentStep: 1,
-  next: () => {},
-  back: () => {},
-});
-
-const useSteps = (steps: number) => {
-  const [step, setStep] = useState(1);
-
-  const next = () => step < steps && setStep((prev) => prev + 1);
-  const back = () => step > 1 && setStep((prev) => prev - 1);
-  return { step, next, back, atStart: step === 1, atEnd: step === steps };
-};
-
 export default function Page() {
-  const { step, back, next, atEnd, atStart } = useSteps(3);
-
   const methods = useForm<Schema>({ resolver: zodResolver(schema) });
 
-  const steps = [Step, Step, Step];
   return (
     <FormProvider {...methods}>
-      <Spacer className="py-2" />
-      <button
-        onClick={back}
-        className="fixed left-10 top-10 rounded-full p-2 transition-colors hover:bg-white/10 laptop:absolute laptop:left-4 laptop:top-2 "
-      >
-        <ArrowLeftIcon />
-      </button>
-      <div className="flex h-full flex-col">
-        <div className="relative flex flex-1 overflow-x-clip">
-          {steps.map((Step, i) => (
-            <Step key={i + 1} currStep={step} step={i + 1} />
-          ))}
-        </div>
-        <div className=" flex flex-col gap-8 px-12 pb-20">
-          {!atEnd ? (
-            <NextButton disabled={false} end={false} onClick={next} />
-          ) : (
+      <div className="flex flex-col">
+        <div className="relative flex flex-1 overflow-x-clip"></div>
+        <form
+          onSubmit={methods.handleSubmit(({ handle, email, password }) => {
+            signUp({ handle, email, password });
+          })}
+          className="mx-auto w-full max-w-md px-4"
+        >
+          <p className="text-center text-3xl font-semibold">
+            Create your account
+          </p>
+          <Spacer className="py-6" />
+          <div className="flex flex-col gap-4">
+            <TextInput fieldName="handle" placeholder="Handle" />
+            <TextInput fieldName="email" placeholder="Email" />
+            <TextInput
+              type="password"
+              fieldName="password"
+              placeholder="Password"
+            />
+            <TextInput
+              type="password"
+              fieldName="confirmPassword"
+              placeholder="Confirm Password"
+            />
+
             <button
-              disabled={true}
-              className={cn(
-                "w-full rounded bg-primary py-2 duration-200 disabled:bg-primary/50",
-              )}
+              disabled={methods.formState.isSubmitting}
+              type="submit"
+              className="relative flex w-full items-center justify-center gap-4 rounded-lg  bg-primary py-2  transition-all duration-500 active:translate-y-[1px] disabled:pointer-events-none disabled:animate-none disabled:bg-primary/50"
             >
-              Submit
+              <span className="font-semibold">Login</span>
+              <div className="relative">
+                <span className="absolute -translate-y-1/2">
+                  <Loading
+                    size="h-5 w-5"
+                    show={methods.formState.isSubmitting}
+                    // show={true}
+                  />
+                </span>
+              </div>
             </button>
-          )}
-
-          <StepsIndicator length={steps.length} step={step} />
-        </div>
-
-        {/* <Spacer className="py-1" /> */}
-        {/* <div className="relative h-52">
-        <Image
-          src={faker.image.urlLoremFlickr({ category: "nature" })}
-          className="w-full"
-          alt=""
-          fill
-        />
-      </div>
-      <Avatar
-        src={faker.image.avatar()}
-        className=" h-32 w-32 -translate-y-3/4 translate-x-1/4 border-4 border-black"
-      />
-      <Spacer className="-my-8" /> */}
+            <div>
+              <p>
+                Already have an account?{" "}
+                <span>
+                  <Link href="/login" className="text-primary">
+                    Sign in
+                  </Link>
+                </span>
+              </p>
+            </div>
+          </div>
+        </form>
       </div>
     </FormProvider>
   );
 }
 
-function NextButton({
-  disabled,
-  end,
-  onClick,
+function TextInput({
+  fieldName,
+  placeholder,
+  type,
 }: {
-  disabled: boolean;
-  end: boolean;
-  onClick: () => void;
+  fieldName: string;
+  placeholder: string;
+  type?: string;
 }) {
+  const methods = useFormContext();
+  const value = useWatch({ name: fieldName });
+  const controller = useController({
+    name: fieldName,
+    control: methods.control,
+  });
+
   return (
-    <button
-      disabled={disabled}
-      className={cn(
-        "w-full rounded bg-primary py-2 duration-200 disabled:bg-primary/50",
-      )}
-      onClick={() => {
-        console.log("NEXT");
-        onClick();
+    <Input
+      type={type}
+      name={fieldName}
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => {
+        methods.setValue(fieldName, e.target.value);
       }}
-    >
-      Next
-    </button>
+      onBlur={controller.field.onBlur}
+      error={controller.fieldState.error ? true : false}
+    />
   );
 }
 
-function Step({ step, currStep }: { step: number; currStep: number }) {
-  const {
-    control,
-    formState: { errors, isValid },
-  } = useFormContext();
-  const done = step < currStep;
-  const viewing = step === currStep;
-  return (
-    <div
-      className={cn(
-        "absolute h-full w-full shrink-0 transition-all duration-500",
-        {
-          "-translate-x-full opacity-0": done,
-          "translate-x-full": !done,
-          "translate-x-0": viewing,
-        },
-      )}
-    >
-      <p className="text-center text-3xl font-semibold">Create your identity</p>
-      <Spacer className="py-6" />
-      <div className="flex flex-col gap-4 px-6">
-        <Controller
-          control={control}
-          name="handle"
-          render={({
-            field: { name, onChange, value },
-            fieldState: { error },
-          }) => (
-            <Input
-              autoFocus={true}
-              name={name}
-              placeholder="Handle"
-              value={value}
-              onChange={onChange}
-              error={error ? true : false}
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="displayname"
-          render={({
-            field: { name, onChange, value },
-            fieldState: { error },
-          }) => (
-            <Input
-              name={name}
-              placeholder="Display Name"
-              value={value}
-              onChange={onChange}
-              error={error ? true : false}
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="email"
-          render={({
-            field: { name, onChange, value },
-            fieldState: { error },
-          }) => (
-            <Input
-              name={name}
-              placeholder="Email"
-              value={value}
-              onChange={onChange}
-              error={error ? true : false}
-            />
-          )}
-        />
-      </div>
-    </div>
-  );
-}
+// function StepsIndicator({ length, step }: { length: number; step: number }) {
+//   return (
+//     <div className="flex gap-4">
+//       {new Array(length).fill(null).map((_, i) => {
+//         const active = i + 1 === step;
+//         return (
+//           <div
+//             className={cn("h-[5px] flex-1 rounded-full ", {
+//               "animate-pulse bg-primary": active,
+//               "bg-primary/60": !active,
+//               "bg-primary": i + 1 < step,
+//             })}
+//           />
+//         );
+//       })}
+//     </div>
+//   );
+// }
+
+// const useSteps = (steps: number) => {
+//   const [step, setStep] = useState(1);
+
+//   const next = () => step < steps && setStep((prev) => prev + 1);
+//   const back = () => step > 1 && setStep((prev) => prev - 1);
+//   return { step, next, back, atStart: step === 1, atEnd: step === steps };
+// };
+
+// function NextButton({
+//   disabled,
+//   end,
+//   onClick,
+// }: {
+//   disabled: boolean;
+//   end: boolean;
+//   onClick: () => void;
+// }) {
+//   return (
+//     <button
+//       disabled={disabled}
+//       className={cn(
+//         "w-full rounded bg-primary py-2 duration-200 disabled:bg-primary/50",
+//       )}
+//       onClick={() => {
+//         console.log("NEXT");
+//         onClick();
+//       }}
+//     >
+//       Next
+//     </button>
+//   );
+// }

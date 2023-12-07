@@ -1,6 +1,5 @@
 import { sql } from "drizzle-orm";
 import { MoreHorizontal } from "lucide-react";
-import { verifyJWT } from "@/lib/auth";
 import db from "@/server/db";
 import { MainLayout } from "@/app/_layouts/MainLayout";
 import { Aside } from "../home/layout";
@@ -8,11 +7,12 @@ import { Spacer } from "@/app/_components/Spacer";
 import { getPosts } from "@/server/db/queries";
 import PostsList from "@/app/_components/Post/PostsList";
 import { idSchema } from "@/schemas";
+import { getUser } from "@/actions/auth";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
-  const {
-    payload: { user },
-  } = await verifyJWT();
+  const user = await getUser();
+  if (!user) redirect("/");
 
   try {
     const response = await db.execute(

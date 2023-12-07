@@ -1,15 +1,15 @@
 "use client";
-import React, { forwardRef, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Spacer } from "@/app/_components/Spacer";
 import { motion } from "framer-motion";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import * as RToast from "@radix-ui/react-toast";
 import { cn } from "@/lib/utils";
-import { login } from "../_actions";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { login } from "@/actions/auth";
 
 type Result<T> = { success: true; data: T } | { success: false; error: string };
 type AsyncFunction = (...args: any) => Promise<any>;
@@ -41,11 +41,11 @@ const schema = z.object({
 
 type Schema = z.infer<typeof schema>;
 
-export default function CredentialAuth() {
+export function CredentialAuthForm() {
   const {
     handleSubmit,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isValid, isDirty },
   } = useForm<Schema>({ resolver: zodResolver(schema) });
   const [toast, setToast] = useState<React.ReactNode | null>();
   const [showToast, setShowToast] = useState(false);
@@ -59,11 +59,7 @@ export default function CredentialAuth() {
     password: string;
   }) => {
     const response = await login({ name, password });
-    if (response.success) {
-      response.data;
-      router.push("/home");
-      return;
-    }
+    if (response.ok) return;
     let newToast: React.ReactNode;
     switch (response.error) {
       case "Invalid credentials":
@@ -116,6 +112,7 @@ export default function CredentialAuth() {
           fieldState: { error },
         }) => (
           <Input
+            type="password"
             error={error ? true : false}
             value={value}
             onChange={onChange}
@@ -126,8 +123,9 @@ export default function CredentialAuth() {
 
       <Spacer className="my-6" />
       <button
+        disabled={(!isValid && isDirty) || isSubmitting || !isDirty}
         type="submit"
-        className="relative w-full rounded-full bg-gray-200 py-2 text-black transition-colors hover:bg-gray-200/90"
+        className="relative w-full rounded-lg  bg-primary py-2  transition-all duration-500 active:translate-y-[1px] disabled:pointer-events-none disabled:animate-none disabled:bg-primary/50"
       >
         <span className="font-semibold">Login</span>
 
@@ -172,6 +170,8 @@ export function Input(props: InputProps) {
     >
       <motion.input
         // autoFocus={props.autoFocus}
+        animate={focused}
+        type={props.type}
         onKeyDown={(e) => {
           props.onKeyDown && props.onKeyDown(e);
         }}
@@ -186,12 +186,12 @@ export function Input(props: InputProps) {
           props.onChange && props.onChange(e);
         }}
         onBlur={(e) => {
+          props.onBlur && props.onBlur(e);
           if (e.currentTarget.value.trim()) {
           } else {
             setFocused("unfocused");
           }
         }}
-        type="text"
         name="name"
         className={cn(
           "w-full bg-transparent p-2 pt-5 outline-none",

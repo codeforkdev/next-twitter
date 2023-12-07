@@ -1,5 +1,7 @@
+import { getUser } from "@/actions/auth";
 import { MainLayout } from "@/app/_layouts/MainLayout";
 import { Link } from "lucide-react";
+import { redirect } from "next/navigation";
 
 function Aside() {
   return (
@@ -32,7 +34,9 @@ function Aside() {
   );
 }
 
-export default function Page() {
+export default async function Page() {
+  const user = await getUser();
+  if (!user) redirect("/");
   return (
     <MainLayout
       main={<></>}

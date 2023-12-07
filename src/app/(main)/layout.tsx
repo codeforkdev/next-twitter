@@ -1,18 +1,17 @@
 import { MobileNavbar } from "@/app/_components/Navigation/MobileNavigation";
 import { cn } from "@/lib/utils";
-import { verifyJWT } from "@/lib/auth";
 import { DesktopNavbar } from "@/app/_components/Navigation/DesktopNavigation";
 import { UserProvider } from "./UserProvider";
+import { redirect } from "next/navigation";
+import { getUser } from "@/actions/auth";
 
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const {
-    payload: { user },
-  } = await verifyJWT();
-
+  const user = await getUser();
+  if (!user) redirect("/");
   return (
     <UserProvider user={user}>
       <Container>
