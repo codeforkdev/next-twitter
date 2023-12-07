@@ -35,7 +35,7 @@ export default function PickUser({
             <p>@{user.handle}</p>
           </div>
           <button
-            onClick={() => login({ userId: user.id })}
+            // onClick={() => login({ userId: user.id })}
             className="ml-auto h-fit rounded-lg border border-primary px-4 py-2 text-primary transition-all hover:bg-primary hover:text-white"
           >
             Login
