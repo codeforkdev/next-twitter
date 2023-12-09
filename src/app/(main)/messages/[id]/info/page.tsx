@@ -1,18 +1,18 @@
+import { getUser } from "@/actions/auth";
 import { Avatar } from "@/app/_components/Avatar";
 import BackButton from "@/app/_components/BackButton";
 import { Spacer } from "@/app/_components/Spacer";
-import { verifyJWT } from "@/lib/auth";
 import db from "@/server/db";
-import { verify } from "crypto";
 import { sql } from "drizzle-orm";
 import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 export default async function Page({ params }: { params: { id: string } }) {
-  const {
-    payload: { user },
-  } = await verifyJWT();
+  const user = await getUser();
+  if (!user) redirect("/login");
+
   const schema = z.object({
     id: z.string(),
     displayName: z.string(),

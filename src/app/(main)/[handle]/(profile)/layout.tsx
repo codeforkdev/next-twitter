@@ -18,10 +18,11 @@ import { Avatar } from "@/app/_components/Avatar";
 import { Spacer } from "@/app/_components/Spacer";
 import { followings, users } from "@/server/db/schema";
 import db from "@/server/db";
-import { verifyJWT } from "@/lib/auth";
 import { MainLayout } from "@/app/_layouts/MainLayout";
 import { Aside } from "../../home/layout";
 import { z } from "zod";
+import { getUser } from "@/actions/auth";
+import { redirect } from "next/navigation";
 
 export default async function Layout({
   params,
@@ -30,9 +31,8 @@ export default async function Layout({
   params: { handle: string };
   children: React.ReactNode;
 }) {
-  const {
-    payload: { user: me },
-  } = await verifyJWT();
+  const me = await getUser();
+  if (!me) redirect("/login");
 
   const profile = await db.query.users.findFirst({
     where: eq(users.handle, params.handle),

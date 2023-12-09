@@ -3,12 +3,12 @@ import Link from "next/link";
 import { ArrowLeftIcon, InfoIcon, Send } from "lucide-react";
 import React from "react";
 import db from "@/server/db";
-import { verifyJWT } from "@/lib/auth";
 import { z } from "zod";
 import { messageSchema } from "@/schemas";
 import { Avatar } from "@/app/_components/Avatar";
 import { AvatarGrid } from "@/app/_components/AvatarGrid";
-import * as Chat from "./_components/Chat";
+import { getUser } from "@/actions/auth";
+import { redirect } from "next/navigation";
 
 const participantSchema = z.object({
   id: z.string(),
@@ -22,9 +22,8 @@ const participantSchema = z.object({
 type TParticipant = z.infer<typeof participantSchema>;
 
 export default async function Page({ params }: { params: { id: string } }) {
-  const {
-    payload: { user },
-  } = await verifyJWT();
+  const user = await getUser();
+  if (!user) redirect("/login");
 
   const participantsResponse = await db.execute(sql`
     SELECT u.id as userId, u.created_at as joinedAt, p.id, handle, avatar, display_name as displayName 

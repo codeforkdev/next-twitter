@@ -3,18 +3,17 @@ import Link from "next/link";
 import ConversationsList from "./_components/ConversationsList";
 import { Spacer } from "@/app/_components/Spacer";
 import NewConversationModal from "./_components/NewConversationModal";
-import { verifyJWT } from "@/lib/auth";
 import ConversationPageDynamicLayout from "./_components/ConversationListContainer";
+import { getUser } from "@/actions/auth";
+import { redirect } from "next/navigation";
 
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const {
-    payload: { user },
-  } = await verifyJWT();
-
+  const user = await getUser();
+  if (!user) redirect("/login");
   return (
     <ConversationPageDynamicLayout
       list={

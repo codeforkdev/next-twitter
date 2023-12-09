@@ -6,7 +6,6 @@ import { nanoid } from "nanoid";
 import db from "@/server/db";
 import { MainLayout } from "@/app/_layouts/MainLayout";
 import { views } from "@/server/db/schema";
-import { verifyJWT } from "@/lib/auth";
 import { broadcast } from "@/actions/posts";
 import { getPosts } from "@/server/db/queries";
 import PostsList from "@/app/_components/Post/PostsList";
@@ -14,11 +13,12 @@ import { idSchema } from "@/schemas";
 import ParentPost from "./_components/ParentPost";
 import PostReply from "./_components/PostReply";
 import { Aside } from "@/app/(main)/home/layout";
+import { getUser } from "@/actions/auth";
+import { redirect } from "next/navigation";
 
 export default async function Page({ params }: { params: { postid: string } }) {
-  const {
-    payload: { user },
-  } = await verifyJWT();
+  const user = getUser();
+  if (!user) redirect("/login");
 
   // insert view
   await db
