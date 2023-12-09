@@ -1,14 +1,14 @@
+import { getUser } from "@/actions/auth";
 import PostsList from "@/app/_components/Post/PostsList";
-import { verifyJWT } from "@/lib/auth";
 import { idSchema } from "@/schemas";
 import db from "@/server/db";
 import { getPosts } from "@/server/db/queries";
 import { sql } from "drizzle-orm";
+import { redirect } from "next/navigation";
 
 export default async function Page({ params }: { params: { handle: string } }) {
-  const {
-    payload: { user },
-  } = await verifyJWT();
+  const user = await getUser();
+  if (!user) redirect("/");
 
   const postIds = await db.execute(
     sql.raw(`

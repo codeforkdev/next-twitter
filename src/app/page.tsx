@@ -1,9 +1,10 @@
-"use client";
 import { Spacer } from "@/app/_components/Spacer";
-import { ForkliftIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { Spotlight } from "./Spotlight";
+import { ExploreBtn } from "./ExploreBtn";
+import { getUser } from "@/actions/auth";
+import { redirect } from "next/navigation";
 
 export function Logo() {
   return (
@@ -16,19 +17,12 @@ export function Logo() {
   );
 }
 
-export default function Page() {
-  const [cursor, setCurosr] = useState({ x: 0, y: 0 });
-
+export default async function Page() {
+  const user = await getUser();
+  if (user) redirect("/home");
   return (
     <>
-      <div
-        onMouseMove={(e) => {
-          const { clientX, clientY } = e;
-          setCurosr({ x: clientX, y: clientY });
-        }}
-        className="opacity-1  fixed left-0 top-0 flex h-screen w-full flex-col justify-center"
-        style={{}}
-      >
+      <Spotlight>
         <div className="flex w-full max-w-7xl flex-1 shrink-0 items-center justify-center px-8 md:px-0 laptop:mx-auto laptop:gap-60">
           <div className="fixed left-12 top-12 laptop:relative">
             <Logo />
@@ -42,20 +36,16 @@ export default function Page() {
               <p className="text-3xl font-bold">Join today.</p>
               <Spacer className="my-6" />
               <div className="flex flex-col gap-3">
-                <form className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4">
                   <Link
                     className="block w-full rounded-full  bg-neutral-700 py-2 text-center text-sm font-semibold text-white  active:translate-y-[1px]"
                     href="/signup"
                   >
                     Create Account
                   </Link>
-                  <Link
-                    className="block w-full rounded-full  bg-rose-600 py-2 text-center text-sm font-semibold text-white active:translate-y-[1px]"
-                    href="/signup"
-                  >
-                    Explore
-                  </Link>
-                </form>
+                </div>
+
+                <ExploreBtn />
 
                 <p className="text-xs">
                   By signing up, you agree to the{" "}
@@ -149,14 +139,7 @@ export default function Page() {
             <FooterLink href="https://twitter.com/settings" text="Settings" />
           </ul>
         </footer>
-      </div>
-      <div
-        className="opacity-1 pointer-events-none fixed left-0 top-0 h-screen w-full"
-        // style={{ top: `${cursor.y}px`, left: `${cursor.x}px` }}
-        style={{
-          background: `radial-gradient(circle at ${cursor.x}px ${cursor.y}px, #00000000 10px, #000000ee 2500px)`,
-        }}
-      />
+      </Spotlight>
     </>
   );
 }

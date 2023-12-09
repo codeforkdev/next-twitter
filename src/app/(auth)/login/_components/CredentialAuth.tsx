@@ -1,38 +1,14 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import { Spacer } from "@/app/_components/Spacer";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import * as RToast from "@radix-ui/react-toast";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { login } from "@/actions/auth";
-
-type Result<T> = { success: true; data: T } | { success: false; error: string };
-type AsyncFunction = (...args: any) => Promise<any>;
-
-function useAction<T extends AsyncFunction>(action: T) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  type ActionParams = Parameters<T>;
-  type ActionReturnType = Awaited<Result<T>>;
-
-  const execute = async (
-    params: ActionParams[0],
-  ): Promise<ActionReturnType> => {
-    setIsLoading(true);
-    const response = await action(params);
-    response.success ? setError(null) : setError(response.error);
-    setIsLoading(false);
-    return response;
-  };
-
-  return { execute, isLoading, error };
-}
 
 const schema = z.object({
   name: z.string().trim().min(1, { message: "Required" }),
@@ -49,7 +25,6 @@ export function CredentialAuthForm() {
   } = useForm<Schema>({ resolver: zodResolver(schema) });
   const [toast, setToast] = useState<React.ReactNode | null>();
   const [showToast, setShowToast] = useState(false);
-  const router = useRouter();
 
   const handleLogin = async ({
     name,
@@ -76,10 +51,6 @@ export function CredentialAuthForm() {
     setToast(newToast);
     setShowToast(true);
   };
-
-  useEffect(() => {
-    console.log(errors);
-  }, [errors]);
 
   return (
     <form
@@ -123,7 +94,6 @@ export function CredentialAuthForm() {
 
       <Spacer className="my-6" />
       <button
-        disabled={(!isValid && isDirty) || isSubmitting || !isDirty}
         type="submit"
         className="relative w-full rounded-lg  bg-primary py-2  transition-all duration-500 active:translate-y-[1px] disabled:pointer-events-none disabled:animate-none disabled:bg-primary/50"
       >

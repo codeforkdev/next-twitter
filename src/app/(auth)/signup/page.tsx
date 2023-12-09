@@ -2,7 +2,6 @@
 import { z } from "zod";
 import { Input } from "../login/_components/CredentialAuth";
 import {
-  Controller,
   FormProvider,
   useController,
   useForm,
@@ -11,12 +10,31 @@ import {
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Spacer } from "@/app/_components/Spacer";
-import { cn } from "@/lib/utils";
-import React, { createContext, useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Loading from "@/app/(main)/home/loading";
-import { register } from "module";
 import { signUp } from "@/actions/auth";
+
+type Result<T> = { success: true; data: T } | { success: false; error: string };
+type AsyncFunction = (...args: any) => Promise<any>;
+
+function useAction<T extends AsyncFunction>(action: T) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  type ActionParams = Parameters<T>;
+  type ActionReturnType = Awaited<Result<T>>;
+
+  const run = async (params: ActionParams[0]): Promise<ActionReturnType> => {
+    setIsLoading(true);
+    const response = await action(params);
+    response.success ? setError(null) : setError(response.error);
+    setIsLoading(false);
+    return response;
+  };
+
+  return { run, isLoading, error };
+}
 
 const schema = z
   .object({
@@ -38,17 +56,16 @@ export default function Page() {
 
   return (
     <FormProvider {...methods}>
-      <div className="flex flex-col">
-        <div className="relative flex flex-1 overflow-x-clip"></div>
+      <div className="mx-auto flex flex-col">
+        <p className="text-center text-3xl font-semibold">
+          Create your account
+        </p>
         <form
           onSubmit={methods.handleSubmit(({ handle, email, password }) => {
             signUp({ handle, email, password });
           })}
-          className="mx-auto w-full max-w-md px-4"
+          className="mx-auto w-full max-w-sm px-4"
         >
-          <p className="text-center text-3xl font-semibold">
-            Create your account
-          </p>
           <Spacer className="py-6" />
           <div className="flex flex-col gap-4">
             <TextInput fieldName="handle" placeholder="Handle" />
@@ -69,13 +86,12 @@ export default function Page() {
               type="submit"
               className="relative flex w-full items-center justify-center gap-4 rounded-lg  bg-primary py-2  transition-all duration-500 active:translate-y-[1px] disabled:pointer-events-none disabled:animate-none disabled:bg-primary/50"
             >
-              <span className="font-semibold">Login</span>
+              <span className="font-semibold">Sign up</span>
               <div className="relative">
                 <span className="absolute -translate-y-1/2">
                   <Loading
                     size="h-5 w-5"
                     show={methods.formState.isSubmitting}
-                    // show={true}
                   />
                 </span>
               </div>

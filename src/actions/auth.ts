@@ -28,6 +28,7 @@ export async function login({
   name: string;
   password: string;
 }): Promise<{ ok: false; error: string } | { ok: true }> {
+  console.log("LOGIN:", name);
   const response = await findUser({ name, password });
   if (!response.ok) {
     return { ok: false, error: response.error };
@@ -156,6 +157,7 @@ export async function signUp({
   email: string;
   password: string;
 }) {
+  console.log("SIGNUP:", handle);
   const newUser = {
     id: nanoid(),
     handle,
@@ -165,14 +167,21 @@ export async function signUp({
     password,
   } satisfies typeof users.$inferInsert;
   try {
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.handle, handle),
+    });
+    if (existingUser) {
+      return { ok: false, message: "Handle is already taken" };
+    }
     await db.insert(users).values(newUser);
     const user = await db.query.users.findFirst({
       where: eq(users.id, newUser.id),
     });
+    console.log("DB USER", user);
     if (!user) {
       return { ok: false };
     }
-
+    ("SIGNUP: Begin login process");
     const response = await login({
       name: user.handle,
       password: user.password,
@@ -183,7 +192,8 @@ export async function signUp({
     }
 
     return { ok: true };
-  } catch {
+  } catch (e: any) {
+    console.log(e.message);
     return {
       ok: false,
       error: "Fatal DB Error",
