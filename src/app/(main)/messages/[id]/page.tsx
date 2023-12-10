@@ -9,6 +9,7 @@ import { Avatar } from "@/app/_components/Avatar";
 import { AvatarGrid } from "@/app/_components/AvatarGrid";
 import { getUser } from "@/actions/auth";
 import { redirect } from "next/navigation";
+import { Chat } from "./_components/Chat";
 
 const participantSchema = z.object({
   id: z.string(),
@@ -81,6 +82,7 @@ export default async function Page({ params }: { params: { id: string } }) {
       )}
 
       <div />
+      <Chat />
       {/* <ol className="flex h-full flex-col border-2 border-blue-500">
           <Chat.Scrollable>
             <Chat.Messages>
