@@ -2,7 +2,6 @@ import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
 import type { Metadata } from "next";
 import React from "react";
-import { LiveStateClient } from "./LiveClient";
 import { GeistSans } from "geist/font/sans";
 import * as Toast from "./(auth)/Toast";
 
@@ -20,9 +19,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className={cn(GeistSans.className, " h-full")}>
-        <Toast.Provider swipeDirection="down">
-          <LiveStateClient>{children}</LiveStateClient>
-        </Toast.Provider>
+        <Toast.Provider swipeDirection="down">{children}</Toast.Provider>
       </body>
     </html>
   );

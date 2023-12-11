@@ -2,7 +2,7 @@
 import { SendIcon } from "lucide-react";
 import useChat from "./Chat/ChatStore";
 
-export function Chat() {
+export function Chat({ avatar }: { avatar: string }) {
   const { Chat } = useChat({
     id: "1",
     messages: [{ id: "123", text: "hello" }],
@@ -24,7 +24,7 @@ export function Chat() {
         <div className="flex items-center gap-4 rounded-xl  bg-white/10 p-4 px-4 py-1">
           <Chat.Input
             className="flex-1 bg-transparent p-2 outline-none"
-            typingTimeout={500}
+            typer={{ avatar, timeout: 5000 }}
           />
           <Chat.Trigger>
             <Chat.Trigger className="rotate-45 p-2 text-primary">

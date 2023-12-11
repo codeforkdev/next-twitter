@@ -3,13 +3,7 @@ import { PKURL } from "@/app/_components/Post/constants";
 import { cn } from "@/lib/utils";
 import { returningSchema, sendingSchema } from "@/server/party/chatprovider";
 import usePartySocket from "partysocket/react";
-import React, {
-  FormEvent,
-  createContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
+import React, { FormEvent, createContext, useMemo, useRef } from "react";
 import { z } from "zod";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { create } from "zustand";
@@ -93,39 +87,39 @@ export default function useChat<T>({
   }
 
   type InputProps = React.ButtonHTMLAttributes<HTMLInputElement> & {
-    typingTimeout: number;
+    typer: {
+      timeout: number;
+      avatar: string;
+    };
   };
 
   function Input(props: InputProps) {
-    const { typingTimeout, ...inputProps } = props;
+    const { typer, ...inputProps } = props;
     const isTyping = useRef<boolean>(false);
     const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
 
-    const handleEnter = () => {
-      sendMessage();
-    };
+    function startTyping() {
+      sendValid({ type: "typing", avatar: typer.avatar, typing: true });
+    }
+
+    function stopTyping() {
+      sendValid({ type: "typing", typing: false });
+    }
 
     const handleInput = (e: FormEvent<HTMLInputElement>) => {
-      console.log("INPUT");
       chatStore.text = e.currentTarget.value;
-      // if (e.currentTarget.value) {
-      //   if (!isTyping.current) {
-      //     isTyping.current = true;
-      //     typing.start();
-      //     timeoutIdRef.current = setTimeout(
-      //       () => typing.stop(),
-      //       props.typingTimeout,
-      //     );
-      //     return;
-      //   }
-      //   if (timeoutIdRef.current) {
-      //     clearTimeout(timeoutIdRef.current);
-      //     timeoutIdRef.current = setTimeout(
-      //       () => typing.stop(),
-      //       props.typingTimeout,
-      //     );
-      //   }
-      // }
+      if (e.currentTarget.value) {
+        if (!isTyping.current) {
+          isTyping.current = true;
+          startTyping();
+          timeoutIdRef.current = setTimeout(stopTyping, props.typer.timeout);
+          return;
+        }
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current);
+          timeoutIdRef.current = setTimeout(stopTyping, props.typer.timeout);
+        }
+      }
     };
 
     return (
@@ -134,7 +128,7 @@ export default function useChat<T>({
         className={cn(props.className)}
         // ref={inputRef}
         onInput={handleInput}
-        onKeyUp={(e) => e.key === "Enter" && handleEnter()}
+        onKeyUp={(e) => e.key === "Enter" && sendMessage()}
       />
     );
   }
