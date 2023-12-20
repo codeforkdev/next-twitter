@@ -1,18 +1,33 @@
 "use client";
+import { PKURL } from "@/app/_components/Post/constants";
 import { cn } from "@/lib/utils";
-import * as ScrollArea from "@radix-ui/react-scroll-area";
+import { SendingSchema } from "@/server/party/chatprovider";
+import * as Scroll from "@radix-ui/react-scroll-area";
+import { ImageIcon, SendIcon, SmileIcon } from "lucide-react";
 import { nanoid } from "nanoid";
-import React, { useEffect, useRef, useState } from "react";
+import usePartySocket from "partysocket/react";
+import React, { useRef, useState } from "react";
 
 function useChat<T extends { id: string }>({
+  room,
   initialMessages,
   onSend,
 }: {
+  room: string;
   initialMessages: T[];
   onSend: ({ text }: { text: string }) => Promise<Required<T>>;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState<T[]>(initialMessages);
+
+  const ws = usePartySocket({
+    host: PKURL,
+    room,
+    party: "chatprovider",
+    onMessage: (e) => {
+      console.log(e.data);
+    },
+  });
 
   function Messages({ Message }: { Message: (msg: T) => React.ReactNode }) {
     return <ol>{messages.map((message) => Message(message))}</ol>;
@@ -30,22 +45,29 @@ function useChat<T extends { id: string }>({
     return <input ref={inputRef} {...restProps} />;
   }
 
-  function Trigger() {
+  type TriggerProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    typer?: {
+      timeout: number;
+      avatar: string;
+    };
+  };
+
+  function Trigger(props: TriggerProps) {
     return (
       <button
         onClick={async () => {
           const text = inputRef.current?.value;
           if (!text) return;
           const newMessage = await onSend({ text });
-          setMessages((prev) => [...prev, newMessage]);
+          ws.send({ type: "message", message: newMessage } as SendingSchema);
+          // setMessages((prev) => [...prev, newMessage]);
         }}
-      >
-        Send
-      </button>
+        {...props}
+      />
     );
   }
 
-  function Scrollable({
+  function ScrollArea({
     windowClassName,
     thumbClassName,
     scrollBarClassName,
@@ -76,12 +98,13 @@ function useChat<T extends { id: string }>({
     // }, [messages]);
 
     return (
-      <ScrollArea.Root
+      <Scroll.Root
         type="auto"
-        className={cn("flex-1 overflow-hidden", windowClassName)}
+        className={cn(windowClassName, "overflow-y-hidden")}
       >
-        <ScrollArea.Viewport
-          className="flex h-full flex-col gap-2 py-4 pl-2 pr-5"
+        <Scroll.Viewport
+          // className="flex h-full flex-col gap-2 py-4 pl-2 pr-5"
+          className="h-full overflow-y-auto"
           ref={container}
         >
           <div className="flex h-full flex-col gap-2 ">
@@ -89,38 +112,87 @@ function useChat<T extends { id: string }>({
             {children}
             <div ref={bottom} />
           </div>
-        </ScrollArea.Viewport>
-        <ScrollArea.Scrollbar
-          className={cn("h-full w-3 bg-white/30", scrollBarClassName)}
+        </Scroll.Viewport>
+        <Scroll.Scrollbar
+          className={cn("h-full w-3 bg-white/30 p-0.5", scrollBarClassName)}
         >
-          <ScrollArea.Thumb
-            className={cn("w-full rounded-full bg-gray-500", thumbClassName)}
-          />
-        </ScrollArea.Scrollbar>
-      </ScrollArea.Root>
+          <Scroll.Thumb className={cn("w-full bg-gray-500", thumbClassName)} />
+        </Scroll.Scrollbar>
+      </Scroll.Root>
     );
   }
 
-  return { Messages, Input, Trigger };
+  return { Messages, Input, Trigger, ScrollArea };
 }
 
-export function Chat() {
-  const { Messages, Input, Trigger } = useChat({
-    initialMessages: [{ id: "", text: "First Message" }],
+type MessageProps = {
+  id: string;
+  pariticpantId: string;
+  text: string;
+};
+function Message(props: MessageProps) {
+  return <div>{props.text}</div>;
+}
+
+export function Chat({
+  id,
+  messages,
+  participantId,
+}: {
+  id: string;
+  participantId: string;
+  messages: { id: string; participantId: string; text: string }[];
+}) {
+  const { Messages, Input, Trigger, ScrollArea } = useChat({
+    room: id,
+    initialMessages: messages,
     onSend: async ({ text }) => {
-      return { id: nanoid(), text };
+      return { id: nanoid(), text, participantId };
     },
   });
 
   return (
     <>
-      <Input className="text-black" />
-      <Messages
-        Message={(message) => {
-          return <div>{message.text}</div>;
-        }}
-      />
-      <Trigger />
+      <ScrollArea
+        windowClassName="flex-1 border-b border-neutral-700"
+        thumbClassName="bg-neutral-700"
+        scrollBarClassName="bg-neutral-900"
+      >
+        <Messages
+          Message={({ id, participantId, text }) => {
+            return (
+              <Message text={text} id={id} pariticpantId={participantId} />
+            );
+          }}
+        />
+      </ScrollArea>
+
+      <div className="p-2">
+        <div className="flex gap-4 rounded-2xl bg-neutral-800 py-2 pl-4">
+          <div className="flex items-center gap-4">
+            <button className="text-primary">
+              <ImageIcon size={16} />
+            </button>
+            <button className="text-primary">
+              <div className="flex items-center justify-center rounded border border-primary p-[1px] text-[8px] font-semibold text-primary">
+                Gif
+              </div>
+            </button>
+            <button className="text-primary">
+              <SmileIcon size={16} />
+            </button>
+          </div>
+
+          <Input
+            className="flex-1 bg-transparent outline-none"
+            placeholder="Start a new message"
+          />
+
+          <Trigger className="rounded px-4 py-2 text-primary">
+            <SendIcon size={18} className="rotate-45" />
+          </Trigger>
+        </div>
+      </div>
     </>
   );
 }

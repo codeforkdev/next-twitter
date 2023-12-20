@@ -171,10 +171,13 @@ export default function useChat<T>({
     return (
       <ScrollArea.Root
         type="auto"
-        className={cn("flex-1 overflow-hidden", windowClassName)}
+        className={cn(
+          "h-full overflow-hidden border-4 border-red-500",
+          windowClassName,
+        )}
       >
         <ScrollArea.Viewport
-          className="flex h-full flex-col gap-2 py-4 pl-2 pr-5"
+          className="flex h-full flex-col gap-2 border-4 border-purple-500 py-4 pl-2 pr-5"
           ref={container}
         >
           <div className="flex h-full flex-col gap-2 ">

@@ -1,15 +1,14 @@
 import { sql } from "drizzle-orm";
 import Link from "next/link";
-import { ArrowLeftIcon, InfoIcon, Send } from "lucide-react";
+import { ArrowLeftIcon, InfoIcon } from "lucide-react";
 import React from "react";
 import db from "@/server/db";
 import { z } from "zod";
 import { messageSchema } from "@/schemas";
-import { Avatar } from "@/app/_components/Avatar";
 import { AvatarGrid } from "@/app/_components/AvatarGrid";
 import { getUser } from "@/actions/auth";
 import { redirect } from "next/navigation";
-import { Chat } from "./Chat2";
+import { Chat } from "./_components/Chat";
 
 const participantSchema = z.object({
   id: z.string(),
@@ -63,7 +62,7 @@ export default async function Page({ params }: { params: { id: string } }) {
   return (
     <div className="flex h-[100dvh] flex-col">
       <Header conversationId={params.id} participants={participants.others} />
-      {participants.others.length === 1 && (
+      {/* {participants.others.length === 1 && (
         <Link
           href={`/${participants.others[0].handle}`}
           className="flex flex-col items-center gap-1 border-b border-white/20 py-4 transition-colors hover:bg-neutral-600/20"
@@ -79,60 +78,19 @@ export default async function Page({ params }: { params: { id: string } }) {
             })}
           </p>
         </Link>
-      )}
+      )} */}
 
-      <div />
+      {/* <Chat
+        id={params.id}
+        participantId={participants.user.id}
+        messages={messages}
+      /> */}
 
-      <Chat />
-      {/* <Chat avatar={user.avatar} /> */}
-      {/* <ol className="flex h-full flex-col border-2 border-blue-500">
-          <Chat.Scrollable>
-            <Chat.Messages>
-              {(m) => {
-                return <div />;
-                //  const myMsg = m.participantId === participantId;
-                //  return (
-                //    <div
-                //      key={m.id}
-                //      className={cn("max-w-[65%]", { "self-end": myMsg })}
-                //    >
-                //      <p
-                //        className={cn("rounded-lg p-2", {
-                //          " bg-primary": myMsg,
-                //        })}
-                //      >
-                //        {m.text}
-                //      </p>
-                //      <p
-                //        className={cn("text-xs text-neutral-500", {
-                //          "text-right": myMsg,
-                //        })}
-                //      >
-                //        {m.createdAt.toLocaleDateString("en-us", {
-                //          month: "short",
-                //          year: "numeric",
-                //        })}
-                //      </p>
-                //    </div>
-                //  );
-              }}
-            </Chat.Messages>
-          </Chat.Scrollable>
-        </ol>
-        <div className="p-4">
-          <Chat.Typers />
-          <div className="flex items-center gap-4 rounded-xl  bg-white/10 p-4 px-4 py-1">
-            <Chat.Input
-              placeholder="Your something"
-              className="flex-1 bg-transparent p-2 text-white outline-none"
-              typingTimeout={3000}
-            />
-            <Chat.Trigger className="rotate-45 p-2 text-primary">
-              <Send size={16} />
-            </Chat.Trigger>
-          </div>
-        </div> */}
-      {/* </Chat.Root> */}
+      <Chat
+        avatar={user.avatar}
+        participantId={participants.user.id}
+        conversationId="test"
+      />
     </div>
   );
 }

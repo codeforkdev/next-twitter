@@ -31,6 +31,8 @@ export const sendingSchema = z
       ),
   );
 
+export type SendingSchema = z.infer<typeof sendingSchema>;
+
 export const returningSchema = z
   .object({
     type: z.literal("message"),

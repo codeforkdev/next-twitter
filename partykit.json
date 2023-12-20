@@ -3,6 +3,8 @@
   "main": "src/server/party/index.ts",
   "compatibilityDate": "2023-10-03",
   "parties": {
+    "chat_message": "src/server/party/chat/message.ts",
+    "chat_typing": "src/server/party/chat/typing.ts",
     "post": "src/server/party/post.ts",
     "chat": "src/server/party/chat.ts",
     "message": "src/server/party/message.ts",
