@@ -96,7 +96,7 @@ export function Wrapper({
           opacity: 1,
         },
       }}
-      className="fixed bottom-0 left-0 h-[53px] w-full border-t border-t-slate-700 bg-black tablet:hidden"
+      className=" h-[53px] w-full border-t border-t-slate-700 bg-black tablet:hidden"
     >
       {children}
     </motion.nav>

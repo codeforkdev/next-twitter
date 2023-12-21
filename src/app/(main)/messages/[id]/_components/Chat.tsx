@@ -5,6 +5,7 @@ import { ImageIcon, SendIcon, SmileIcon } from "lucide-react";
 import usePartySocket from "partysocket/react";
 import React, {
   FormEvent,
+  KeyboardEvent,
   createContext,
   useContext,
   useEffect,
@@ -14,24 +15,7 @@ import React, {
 import { sendMessage, sendTypingStatus } from "./_actions";
 import { Avatar } from "@/app/_components/Avatar";
 import { z } from "zod";
-
-const ChatContext = createContext({
-  conversationId: "",
-  participantId: "",
-  avatar: "",
-});
-
-function ChatProvider(props: {
-  children: React.ReactNode;
-  conversationId: string;
-  participantId: string;
-  avatar: string;
-}) {
-  const { children, ...rest } = props;
-  return (
-    <ChatContext.Provider value={{ ...rest }}>{children}</ChatContext.Provider>
-  );
-}
+import { ChatContext, ChatProvider } from "./Chat/Provider";
 
 export function ScrollArea(props: { children: React.ReactNode }) {
   const container = useRef<HTMLDivElement>(null);
@@ -81,7 +65,6 @@ function Message({ id, text, avatar, participantId, createdAt }: Message) {
     return (
       <li className="flex  justify-start">
         <div className="flex max-w-[50%] flex-col gap-1">
-          <Avatar src={avatar} />
           <p className="w-fit rounded-2xl bg-neutral-600 p-2">{text}</p>
           <p className="w-fit text-xs text-neutral-500">
             {createdAt.toLocaleDateString("us-en", {
@@ -195,6 +178,12 @@ export function Input() {
     setText(e.currentTarget.value);
   }
 
+  async function handleKeyUp(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      await handleSendMsg();
+    }
+  }
+
   useEffect(() => {
     if (!text.trim()) {
       if (timeoutRef.current) notTyping();
@@ -229,6 +218,7 @@ export function Input() {
 
         <input
           value={text}
+          onKeyUp={handleKeyUp}
           onInput={handleInput}
           className="flex-1 bg-transparent outline-none"
           placeholder="Start a new message"

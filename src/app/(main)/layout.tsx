@@ -16,7 +16,7 @@ export default async function Layout({
     <UserProvider user={user}>
       <Container>
         <DesktopNavbar />
-        {children}
+        <div className="flex-1 border">{children}</div>
         <MobileNavbar />
       </Container>
     </UserProvider>
@@ -27,7 +27,7 @@ function Container({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        "mx-auto  w-full ",
+        "mx-auto flex flex-col   border-4 border-primary",
         "tablet:flex tablet:max-w-[700px] tablet:flex-row tablet:border-green-500",
         "laptop:max-w-[1000px] laptop:border-red-500",
         "desktop:max-w-[1258px] desktop:border-blue-500",

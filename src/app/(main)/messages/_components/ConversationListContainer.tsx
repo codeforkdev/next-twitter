@@ -48,7 +48,7 @@ export default function ConversationDynamicWindowLayout({
         {list}
       </div>
       <div
-        className={cn("flex-1 border-x border-white/20", {
+        className={cn("flex-1 border-4 border-purple-500", {
           hidden: width < 1000 && pathname.endsWith("/messages"),
         })}
       >

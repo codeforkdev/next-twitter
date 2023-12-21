@@ -60,8 +60,8 @@ export default async function Page({ params }: { params: { id: string } }) {
   const messages = messageSchema.array().parse(messagesResponse.rows).reverse();
 
   return (
-    <div className="flex h-[100dvh] flex-col">
-      <Header conversationId={params.id} participants={participants.others} />
+    <div className="flex h-[100dvh] flex-col border-4 border-orange-500">
+      {/* <Header conversationId={params.id} participants={participants.others} /> */}
       {/* {participants.others.length === 1 && (
         <Link
           href={`/${participants.others[0].handle}`}
@@ -86,11 +86,11 @@ export default async function Page({ params }: { params: { id: string } }) {
         messages={messages}
       /> */}
 
-      <Chat
+      {/* <Chat
         avatar={user.avatar}
         participantId={participants.user.id}
         conversationId="test"
-      />
+      /> */}
     </div>
   );
 }
